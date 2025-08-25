@@ -1,6 +1,5 @@
 # 🐍 Python Sandbox API
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Bhargavxyz738/Python_exeution)
 [![Live Demo](https://img.shields.io/badge/Live_Demo-Online-brightgreen?style=for-the-badge&logo=render)](https://python-exeution.onrender.com)
 [![Language](https://img.shields.io/badge/Language-Python-blue?style=for-the-badge&logo=python)](https://www.python.org/)
 
@@ -325,11 +324,9 @@ else:
 ## 🔧 Deployment & Local Setup
 
 ### 1. Deploy to Render (Recommended)
-Click the button below to deploy this repository directly to your Render account. The `render.yaml` file in the repository configures everything automatically, including the persistent disk for the database.
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Bhargavxyz738/Python_exeution)
-
-You will be prompted to set a value for the `PYTHON_EXE_KEY` secret during setup.
+Click on the button and signup on render and paste the url https://github.com/Bhargavxyz738/Python_exeution.git render will automatically fetched the repo and clone it and run it using `gunicorn main:app`.
 
 ### 2. Local Development
 
