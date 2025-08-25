@@ -327,7 +327,22 @@ else:
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Bhargavxyz738/Python_exeution)
 
-Click on the button and signup on render and paste the url https://github.com/Bhargavxyz738/Python_exeution.git render will automatically fetched the repo and clone it and run it using `gunicorn main:app`.
+Click the button above, sign up on Render, and provide the repository URL:
+
+```
+https://github.com/Bhargavxyz738/Python_exeution.git
+```
+
+Render will automatically clone the repository, set everything up, and run the app using:
+
+```
+gunicorn main:app
+```
+
+---
+
+Do you want me to also make this **marketing-style** (like for a README) so it feels inviting to users who want a one-click deploy?
+
 
 ### 2. Local Development
 
