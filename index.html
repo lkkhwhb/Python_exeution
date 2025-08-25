@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Python Sandbox API Documentation</title>
+    <meta
+      name="description"
+      content="Official documentation for the Python Sandbox API. Run Python code safely in a sandboxed environment with file support, rate limiting, and strict resource controls."
+    />
+    <meta
+      name="keywords"
+      content="Python API, sandbox, secure code execution, REST API, Flask, requests, numpy, fpdf, reportlab"
+    />
+    <meta name="author" content="Bhargav Barman" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://your-domain.com/" />
+    <meta name="theme-color" content="#0d1117" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="application-name" content="Python Sandbox API" />
+    <meta name="apple-mobile-web-app-title" content="Python Sandbox" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐍</text></svg>"
+    />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark-dimmed.min.css"
+    />
+    <script
+      defer
+      src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"
+    ></script>
+    <style>
+      :root {
+        --bg-color: #ffffff;
+        --text-color: #24292e;
+        --text-color-light: #57606a;
+        --header-color: #000000;
+        --border-color: #d0d7de;
+        --link-color: #0969da;
+        --note-bg-color: #f6f8fa;
+        --note-border-color: #0969da;
+        --inline-code-bg: rgba(175, 184, 193, 0.2);
+
+        --code-bg-color: #0d1117;
+        --code-text-color: #c9d1d9;
+        --code-border-color: #30363d;
+        --code-copy-btn-bg: #21262d;
+        --code-copy-btn-hover-bg: #30363d;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
+          Arial, sans-serif;
+        line-height: 1.7;
+        color: var(--text-color);
+        background-color: var(--bg-color);
+        margin: 0;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+      .page-header,
+      .page-footer {
+        background-color: var(--note-bg-color);
+        border-bottom: 1px solid var(--border-color);
+        padding: 20px 0;
+      }
+      .page-footer {
+        border-top: 1px solid var(--border-color);
+        border-bottom: none;
+        margin-top: 80px;
+        font-size: 0.9em;
+        color: var(--text-color-light);
+        text-align: center;
+      }
+      h1,
+      h2,
+      h3 {
+        color: var(--header-color);
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 10px;
+        font-weight: 600;
+      }
+      h1 {
+        font-size: 2.5em;
+        border-bottom: none;
+      }
+      h2 {
+        font-size: 1.8em;
+        margin-top: 50px;
+      }
+      h3 {
+        font-size: 1.4em;
+        margin-top: 30px;
+        border-bottom: none;
+      }
+      a {
+        color: var(--link-color);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      strong {
+        font-weight: 600;
+      }
+
+      main {
+        padding-top: 40px;
+      }
+      code {
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo,
+          Courier, monospace;
+        background-color: var(--inline-code-bg);
+        padding: 0.2em 0.4em;
+        margin: 0;
+        font-size: 85%;
+        border-radius: 6px;
+      }
+      pre {
+        background-color: var(--code-bg-color);
+        border: 1px solid var(--code-border-color);
+        border-radius: 6px;
+        padding: 16px;
+        overflow: auto;
+        position: relative;
+      }
+      pre code.hljs {
+        color: var(--code-text-color);
+        padding: 0;
+        margin: 0;
+        font-size: 100%;
+        background-color: transparent;
+        border: none;
+      }
+      .copy-btn {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background-color: var(--code-copy-btn-bg);
+        color: var(--text-color-light);
+        border: 1px solid var(--code-border-color);
+        border-radius: 6px;
+        padding: 4px 8px;
+        font-size: 12px;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.2s ease-in-out;
+      }
+      pre:hover .copy-btn {
+        opacity: 1;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        border: 1px solid var(--border-color);
+      }
+      th,
+      td {
+        padding: 12px;
+        border: 1px solid var(--border-color);
+        text-align: left;
+        vertical-align: top;
+      }
+      th {
+        background-color: var(--note-bg-color);
+        font-weight: 600;
+      }
+      td code {
+        margin-right: 4px;
+      }
+      .note {
+        background-color: var(--note-bg-color);
+        border-left: 4px solid var(--note-border-color);
+        padding: 1px 20px;
+        margin: 25px 0;
+        border-radius: 0 6px 6px 0;
+      }
+      #toc ul {
+        list-style: none;
+        padding-left: 0;
+      }
+      #toc li {
+        margin-bottom: 8px;
+      }
+
+      #developer-profile {
+        margin-bottom: 40px;
+      }
+      .dev-card-link {
+        display: block;
+        margin-top: 15px;
+        text-decoration: none;
+        color: inherit;
+      }
+      .dev-card {
+        background-color: var(--note-bg-color);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        transition: box-shadow 0.2s ease-in-out;
+      }
+      .dev-card-link:hover .dev-card {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      }
+      .dev-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        border: 2px solid var(--border-color);
+      }
+      .dev-info h3,
+      .dev-info p {
+        margin: 0;
+        padding: 0;
+        border: none;
+      }
+      .dev-info h3 {
+        font-size: 1.5em;
+        color: var(--header-color);
+      }
+      .dev-info .dev-login {
+        font-size: 1.1em;
+        color: var(--text-color-light);
+        margin-bottom: 8px;
+      }
+      .dev-info .dev-bio {
+        font-size: 1em;
+        color: var(--text-color);
+        line-height: 1.5;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="page-header">
+      <div class="container">
+        <h1>🐍 Python Sandbox API</h1>
+        <p style="font-size: 1.1em; color: var(--text-color-light)">
+          Secure, versatile, and sandboxed Python code execution via a simple
+          RESTful API.
+        </p>
+      </div>
+    </header>
+
+    <main>
+      <div class="container">
+        <section id="developer-profile">
+          <h2>Meet the Developer</h2>
+          <a
+            href="#"
+            target="_blank"
+            rel="noopener noreferrer"
+            id="dev-card-link"
+            class="dev-card-link"
+          >
+            <div class="dev-card">
+              <img
+                src=""
+                alt="Developer Avatar"
+                id="dev-avatar"
+                class="dev-avatar"
+                style="background-color: #e1e4e8"
+              />
+              <div class="dev-info">
+                <h3 id="dev-name">Loading...</h3>
+                <p class="dev-login" id="dev-login"></p>
+                <p class="dev-bio" id="dev-bio">
+                  Fetching developer profile from GitHub...
+                </p>
+              </div>
+            </div>
+          </a>
+        </section>
+
+        <nav id="toc">
+          <h3>On this page</h3>
+          <ul>
+            <li><a href="#introduction">Introduction</a></li>
+            <li><a href="#base-url">Base URL & Rate Limits</a></li>
+            <li><a href="#limits">Execution & Resource Limits</a></li>
+            <li><a href="#security">Security & Sandbox Model</a></li>
+            <li><a href="#making-requests">Making Requests</a></li>
+            <li><a href="#endpoint-details">Endpoint Details</a></li>
+            <li><a href="#example">Complete Example</a></li>
+          </ul>
+        </nav>
+
+        <section id="introduction">
+          <h2>Introduction</h2>
+          <p>
+            The Python Sandbox API provides a sandboxed environment to run
+            Python code remotely. Each request is executed in a temporary,
+            isolated environment with strict resource limits and security
+            policies. You can upload files, execute code that processes them,
+            and retrieve the generated output files, all in a single API call.
+          </p>
+        </section>
+
+        <section id="base-url">
+          <h2>Base URL & Rate Limits</h2>
+          <p>
+            All API requests are made to the base URL, which is dynamically
+            detected below. The public API is open and does not require an API
+            key, but is rate-limited by IP address to ensure fair usage and
+            server stability.
+          </p>
+          <pre><code id="baseUrl"></code></pre>
+          <table>
+            <thead>
+              <tr>
+                <th>Limit Type</th>
+                <th>Value</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Requests Per Minute (RPM)</td>
+                <td><code>5</code></td>
+                <td>Maximum requests allowed in a 60-second window.</td>
+              </tr>
+              <tr>
+                <td>Requests Per Day (RPD)</td>
+                <td><code>30</code></td>
+                <td>Total daily request quota, resetting at UTC midnight.</td>
+              </tr>
+              <tr>
+                <td>Server Concurrency</td>
+                <td><code>5</code></td>
+                <td>
+                  Maximum number of simultaneous code executions allowed on the
+                  server. If this limit is reached, you will receive a
+                  <code>503 Service Unavailable</code> error.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section id="limits">
+          <h2>Execution & Resource Limits</h2>
+          <p>
+            To maintain a secure and stable environment, the following resource
+            limits are enforced on every execution:
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>Resource</th>
+                <th>Limit</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Execution Timeout</td>
+                <td><code>10 seconds</code></td>
+                <td>
+                  Your script will be terminated if it runs longer than 10
+                  seconds.
+                </td>
+              </tr>
+              <tr>
+                <td>Max Code Length</td>
+                <td><code>2000 characters</code></td>
+                <td>
+                  The <code>code</code> field in your JSON payload cannot exceed
+                  this length.
+                </td>
+              </tr>
+              <tr>
+                <td>Max Attachments</td>
+                <td><code>2 files</code></td>
+                <td>You can upload a maximum of two files per request.</td>
+              </tr>
+              <tr>
+                <td>Max File Size</td>
+                <td><code>8 MB per file</code></td>
+                <td>Each attached file cannot exceed 8 megabytes in size.</td>
+              </tr>
+              <tr>
+                <td>Max Child Processes</td>
+                <td><code>10</code></td>
+                <td>
+                  Your script is prevented from forking more than 10 child
+                  processes to protect against "fork bomb" attacks.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section id="security">
+          <h2>Security & Sandbox Model</h2>
+          <p>
+            Every code execution is heavily sandboxed with the following
+            restrictions:
+          </p>
+          <ul>
+            <li>
+              <strong>No Network Access:</strong> Scripts cannot make outbound
+              network requests.
+            </li>
+            <li>
+              <strong>Filesystem Isolation:</strong> Code runs in a temporary
+              directory and has no access to the underlying server filesystem.
+            </li>
+            <li>
+              <strong>Import Restrictions:</strong> Only a curated list of safe
+              libraries is available. Modules that could compromise security
+              (e.g., <code>os</code>, <code>sys</code>) are forbidden.
+            </li>
+            <li>
+              <strong>Resource Limits:</strong> Each execution is constrained by
+              the time, process, and memory limits detailed above.
+            </li>
+            <li>
+              <strong>Ephemeral Environment:</strong> The execution directory
+              and all its contents are permanently deleted immediately after the
+              request is completed.
+            </li>
+          </ul>
+        </section>
+
+        <section id="making-requests">
+          <h2>Making Requests</h2>
+          <p>
+            All requests to the <code>/execute</code> endpoint must be a
+            <code>POST</code> request with a JSON body.
+          </p>
+          <h3>Using cURL</h3>
+          <pre><code class="language-bash">curl -X POST <span class="api-url-placeholder"></span> \
+-H "Content-Type: application/json" \
+-d '{
+  "code": "print(\"Hello from the sandbox!\")"
+}'</code></pre>
+          <h3>Using Python <code>requests</code></h3>
+          <pre><code class="language-python">import requests
+import json
+
+api_url = '<span class="api-url-placeholder"></span>'
+payload = {
+    'code': 'for i in range(5): print(f"Count: {i}")'
+}
+
+response = requests.post(api_url, json=payload)
+
+print("Status Code:", response.status_code)
+print("Response JSON:", json.dumps(response.json(), indent=2))
+</code></pre>
+        </section>
+
+        <section id="endpoint-details">
+          <h2>Endpoint Details: <code>POST /execute</code></h2>
+          <h3>Request Body Schema</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Field</th>
+                <th>Type</th>
+                <th>Required</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>code</code></td>
+                <td>String</td>
+                <td><strong>Yes</strong></td>
+                <td>
+                  The Python code to execute (max
+                  <strong>2000 characters</strong>).
+                </td>
+              </tr>
+              <tr>
+                <td><code>stdin_data</code></td>
+                <td>String</td>
+                <td>No</td>
+                <td>Text data passed to the script's standard input.</td>
+              </tr>
+              <tr>
+                <td><code>attachments</code></td>
+                <td>Array of Objects</td>
+                <td>No</td>
+                <td>
+                  Files to be made available. Max <strong>2 files</strong>,
+                  <strong>8MB</strong> each. Each object needs
+                  <code>filename</code> and <code>content_base_64</code> keys.
+                </td>
+              </tr>
+              <tr>
+                <td><code>return_files</code></td>
+                <td>Array of Strings</td>
+                <td>No</td>
+                <td>
+                  A list of filenames generated by the script to be returned in
+                  the response.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>Allowed Libraries</h3>
+          <p>
+            Your code can import from a curated list of standard library and
+            third-party modules. Attempts to import any module not on this list
+            will result in a <code>ForbiddenImportError</code>.
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th>Allowed Modules</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Key Third-Party Libraries</td>
+                <td><code>numpy</code></td>
+              </tr>
+              <tr>
+                <td>Media & Document Generation</td>
+                <td>
+                  <code>PIL (Pillow)</code>, <code>reportlab</code>,
+                  <code>fpdf</code>
+                </td>
+              </tr>
+              <tr>
+                <td>Data & Math</td>
+                <td>
+                  <code>math</code>, <code>statistics</code>,
+                  <code>decimal</code>, <code>fractions</code>,
+                  <code>numbers</code>, <code>random</code>
+                </td>
+              </tr>
+              <tr>
+                <td>Date & Time</td>
+                <td>
+                  <code>datetime</code>, <code>time</code>,
+                  <code>calendar</code>
+                </td>
+              </tr>
+              <tr>
+                <td>Text & Regex</td>
+                <td>
+                  <code>string</code>, <code>re</code>, <code>textwrap</code>,
+                  <code>unicodedata</code>
+                </td>
+              </tr>
+              <tr>
+                <td>Data Structures & Iteration</td>
+                <td>
+                  <code>collections</code>, <code>itertools</code>,
+                  <code>functools</code>, <code>operator</code>,
+                  <code>bisect</code>, <code>heapq</code>, <code>array</code>
+                </td>
+              </tr>
+              <tr>
+                <td>Security & Encoding</td>
+                <td>
+                  <code>hashlib</code>, <code>base64</code>, <code>uuid</code>,
+                  <code>secrets</code>
+                </td>
+              </tr>
+              <tr>
+                <td>Data Serialization</td>
+                <td><code>json</code>, <code>ast</code></td>
+              </tr>
+              <tr>
+                <td>General Utilities</td>
+                <td>
+                  <code>typing</code>, <code>enum</code>,
+                  <code>dataclasses</code>, <code>copy</code>,
+                  <code>pprint</code>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>Error Responses</h3>
+          <p>
+            Errors are returned with a descriptive JSON body and an appropriate
+            HTTP status code.
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>Status Code</th>
+                <th>Error Type</th>
+                <th>Reason</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>400 Bad Request</code></td>
+                <td><code>ValidationError</code></td>
+                <td>
+                  The request JSON is malformed, a file is too large, etc.
+                </td>
+              </tr>
+              <tr>
+                <td><code>400 Bad Request</code></td>
+                <td><code>ForbiddenImportError</code></td>
+                <td>The script attempts to import a disallowed module.</td>
+              </tr>
+              <tr>
+                <td><code>400 Bad Request</code></td>
+                <td><code>TimeoutError</code></td>
+                <td>Execution exceeded the 10-second time limit.</td>
+              </tr>
+              <tr>
+                <td><code>429 Too Many Requests</code></td>
+                <td><code>RateLimitExceeded</code></td>
+                <td>The per-minute or daily request limit has been reached.</td>
+              </tr>
+              <tr>
+                <td><code>503 Service Unavailable</code></td>
+                <td><code>ServerBusy</code></td>
+                <td>
+                  The server has reached its maximum concurrent execution limit.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section id="example">
+          <h2>Complete Example: Image Grayscaling</h2>
+          <p>
+            This example demonstrates a complete workflow: uploading an image,
+            using the <strong>Pillow</strong> library to convert it to
+            grayscale, and receiving the processed image back.
+          </p>
+          <div class="note">
+            <p>
+              <strong>Note:</strong> To run the client script, you need the
+              <code>requests</code> library (<code>pip install requests</code>)
+              and a local image file named <code>my_photo.jpg</code>.
+            </p>
+          </div>
+          <h3>1. The Sandbox Script</h3>
+          <p>
+            This is the code that will run on the server. It opens the attached
+            file by its given name, processes it, and saves a new file which we
+            will ask the API to return.
+          </p>
+          <pre><code class="language-python"># This script is sent in the 'code' field
+from PIL import Image
+
+try:
+    # 'input_photo.jpg' is the filename we specify in the attachment
+    with Image.open('input_photo.jpg') as img:
+        grayscale_img = img.convert('L')
+        grayscale_img.save('output_grayscale.png')
+        print("Image successfully converted to grayscale.")
+except FileNotFoundError:
+    print("Error: 'input_photo.jpg' not found in attachments.")
+except Exception as e:
+    print(f"An unexpected error occurred: {e}")
+</code></pre>
+          <h3>2. The Client-Side Request</h3>
+          <p>
+            This Python script runs on your local machine. It reads your image,
+            constructs the API payload, sends the request, and saves the result.
+          </p>
+          <pre><code class="language-python"># This script runs on your local machine
+import requests
+import base64
+import json
+
+API_URL = '<span class="api-url-placeholder"></span>'
+LOCAL_IMAGE_PATH = 'my_photo.jpg' # Make sure this file exists
+RESULT_IMAGE_PATH = 'result_grayscale.png'
+
+# The sandbox script from above
+sandbox_code = """
+from PIL import Image
+try:
+    with Image.open('input_photo.jpg') as img:
+        grayscale_img = img.convert('L')
+        grayscale_img.save('output_grayscale.png')
+        print("Image successfully converted to grayscale.")
+except Exception as e:
+    print(f"An unexpected error occurred: {e}")
+"""
+
+# 1. Read local image and Base64 encode it
+try:
+    with open(LOCAL_IMAGE_PATH, "rb") as image_file:
+        b64_content = base64.b64encode(image_file.read()).decode('utf-8')
+except FileNotFoundError:
+    print(f"Error: Please create a file named '{LOCAL_IMAGE_PATH}' to run this.")
+    exit()
+
+# 2. Construct the API payload
+payload = {
+    "code": sandbox_code,
+    "attachments": [{
+        "filename": "input_photo.jpg",
+        "content_base_64": b64_content
+    }],
+    "return_files": ["output_grayscale.png"]
+}
+
+# 3. Send the request
+print(f"Sending request to {API_URL}...")
+response = requests.post(API_URL, json=payload)
+
+# 4. Process the response
+if response.status_code == 200:
+    data = response.json().get('execution_details', {})
+    print("API Call Successful!")
+    print(f"  > Stdout: {data.get('stdout', '').strip()}")
+    
+    output_files = data.get('output_files', {})
+    if 'output_grayscale.png' in output_files:
+        grayscale_data = base64.b64decode(output_files['output_grayscale.png'])
+        with open(RESULT_IMAGE_PATH, "wb") as f:
+            f.write(grayscale_data)
+        print(f"> Success! Grayscale image saved to '{RESULT_IMAGE_PATH}'")
+    else:
+        print("> Error: The API did not return the processed image.")
+else:
+    print(f"API Error: {response.status_code}")
+    print(json.dumps(response.json(), indent=2))
+</code></pre>
+        </section>
+      </div>
+    </main>
+
+    <footer class="page-footer">
+      <div class="container">
+        <p>&copy; 2024 Python Sandbox API. All rights reserved.</p>
+        <p>
+          Developed by
+          <a
+            href="https://github.com/Bhargavxyz738"
+            target="_blank"
+            rel="noopener noreferrer"
+            id="developer-link"
+            >Bhargavxyz738</a
+          >.
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", (event) => {
+        async function fetchDeveloperInfo() {
+          const developerLink = document.getElementById("developer-link");
+          if (!developerLink || !developerLink.href) {
+            console.error("Developer link with a valid href not found.");
+            document.getElementById("developer-profile").style.display = "none";
+            return;
+          }
+
+          const githubUrl = developerLink.href;
+          const username = githubUrl.split("/").pop();
+
+          if (!username) {
+            console.error("Could not parse username from developer link.");
+            document.getElementById("developer-profile").style.display = "none";
+            return;
+          }
+
+          const apiUrl = `https://api.github.com/users/${username}`;
+
+          const linkEl = document.getElementById("dev-card-link");
+          const avatarEl = document.getElementById("dev-avatar");
+          const nameEl = document.getElementById("dev-name");
+          const loginEl = document.getElementById("dev-login");
+          const bioEl = document.getElementById("dev-bio");
+
+          try {
+            const response = await fetch(apiUrl);
+            if (!response.ok) throw new Error("Network response was not ok");
+            const data = await response.json();
+
+            linkEl.href = data.html_url;
+            avatarEl.src = data.avatar_url;
+            avatarEl.alt = `${data.name || data.login}'s avatar`;
+            nameEl.textContent = data.name || data.login;
+            loginEl.textContent = `@${data.login}`;
+            bioEl.textContent = data.bio || "Developer of this API.";
+          } catch (error) {
+            console.error("Failed to fetch GitHub profile:", error);
+            nameEl.textContent = username;
+            loginEl.textContent = `@${username}`;
+            bioEl.textContent =
+              "Could not load profile from GitHub. Click to visit profile.";
+            linkEl.href = `https://github.com/${username}`;
+          }
+        }
+
+        const baseUrl = window.location.origin;
+        document.getElementById("baseUrl").textContent = baseUrl;
+
+        const fullApiUrl = baseUrl + "/execute";
+        document.querySelectorAll(".api-url-placeholder").forEach((el) => {
+          el.textContent = fullApiUrl;
+        });
+
+        hljs.highlightAll();
+
+        document.querySelectorAll("pre").forEach((preBlock) => {
+          const codeBlock = preBlock.querySelector("code");
+          if (!codeBlock) return;
+
+          const copyButton = document.createElement("button");
+          copyButton.className = "copy-btn";
+          copyButton.textContent = "Copy";
+          preBlock.appendChild(copyButton);
+
+          copyButton.addEventListener("click", () => {
+            navigator.clipboard
+              .writeText(codeBlock.innerText)
+              .then(() => {
+                copyButton.textContent = "Copied!";
+                setTimeout(() => {
+                  copyButton.textContent = "Copy";
+                }, 2000);
+              })
+              .catch((err) => {
+                console.error("Failed to copy text: ", err);
+              });
+          });
+        });
+
+        fetchDeveloperInfo();
+      });
+    </script>
+  </body>
+</html>
