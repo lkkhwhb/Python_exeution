@@ -25,8 +25,13 @@
       rel="icon"
       href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐍</text></svg>"
     />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono&display=swap"
+      rel="stylesheet"
+    />
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
-    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark-dimmed.min.css"
@@ -46,7 +51,6 @@
         --note-bg-color: #f6f8fa;
         --note-border-color: #0969da;
         --inline-code-bg: rgba(175, 184, 193, 0.2);
-
         --code-bg-color: #0d1117;
         --code-text-color: #c9d1d9;
         --code-border-color: #30363d;
@@ -54,8 +58,8 @@
         --code-copy-btn-hover-bg: #30363d;
       }
       body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
-          Arial, sans-serif;
+        font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Helvetica, Arial, sans-serif;
         line-height: 1.7;
         color: var(--text-color);
         background-color: var(--bg-color);
@@ -63,7 +67,6 @@
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
       }
-
       .container {
         max-width: 900px;
         margin: 0 auto;
@@ -89,7 +92,7 @@
         color: var(--header-color);
         border-bottom: 1px solid var(--border-color);
         padding-bottom: 10px;
-        font-weight: 600;
+        font-weight: 700;
       }
       h1 {
         font-size: 2.5em;
@@ -103,6 +106,7 @@
         font-size: 1.4em;
         margin-top: 30px;
         border-bottom: none;
+        font-weight: 500;
       }
       a {
         color: var(--link-color);
@@ -112,15 +116,17 @@
         text-decoration: underline;
       }
       strong {
-        font-weight: 600;
+        font-weight: 700;
       }
-
       main {
         padding-top: 40px;
       }
+      code,
+      pre {
+        font-family: "Roboto Mono", "SFMono-Regular", Consolas,
+          "Liberation Mono", Menlo, Courier, monospace;
+      }
       code {
-        font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo,
-          Courier, monospace;
         background-color: var(--inline-code-bg);
         padding: 0.2em 0.4em;
         margin: 0;
@@ -132,7 +138,7 @@
         border: 1px solid var(--code-border-color);
         border-radius: 6px;
         padding: 16px;
-        overflow: auto;
+        overflow-x: auto;
         position: relative;
       }
       pre code.hljs {
@@ -160,22 +166,28 @@
       pre:hover .copy-btn {
         opacity: 1;
       }
+      .table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        margin: 20px 0;
+      }
       table {
         width: 100%;
         border-collapse: collapse;
-        margin-top: 20px;
-        border: 1px solid var(--border-color);
+        min-width: 650px;
       }
       th,
       td {
-        padding: 12px;
+        padding: 12px 15px;
         border: 1px solid var(--border-color);
         text-align: left;
         vertical-align: top;
       }
       th {
         background-color: var(--note-bg-color);
-        font-weight: 600;
+        font-weight: 500;
       }
       td code {
         margin-right: 4px;
@@ -194,7 +206,6 @@
       #toc li {
         margin-bottom: 8px;
       }
-
       #developer-profile {
         margin-bottom: 40px;
       }
@@ -222,6 +233,7 @@
         height: 80px;
         border-radius: 50%;
         border: 2px solid var(--border-color);
+        flex-shrink: 0;
       }
       .dev-info h3,
       .dev-info p {
@@ -242,6 +254,28 @@
         font-size: 1em;
         color: var(--text-color);
         line-height: 1.5;
+      }
+      @media (max-width: 768px) {
+        body {
+          line-height: 1.6;
+        }
+        .container {
+          padding: 0 15px;
+        }
+        h1 {
+          font-size: 2em;
+        }
+        h2 {
+          font-size: 1.6em;
+          margin-top: 40px;
+        }
+        h3 {
+          font-size: 1.3em;
+        }
+        .dev-card {
+          flex-direction: column;
+          text-align: center;
+        }
       }
     </style>
   </head>
@@ -319,36 +353,38 @@
             server stability.
           </p>
           <pre><code id="baseUrl"></code></pre>
-          <table>
-            <thead>
-              <tr>
-                <th>Limit Type</th>
-                <th>Value</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Requests Per Minute (RPM)</td>
-                <td><code>5</code></td>
-                <td>Maximum requests allowed in a 60-second window.</td>
-              </tr>
-              <tr>
-                <td>Requests Per Day (RPD)</td>
-                <td><code>30</code></td>
-                <td>Total daily request quota, resetting at UTC midnight.</td>
-              </tr>
-              <tr>
-                <td>Server Concurrency</td>
-                <td><code>5</code></td>
-                <td>
-                  Maximum number of simultaneous code executions allowed on the
-                  server. If this limit is reached, you will receive a
-                  <code>503 Service Unavailable</code> error.
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Limit Type</th>
+                  <th>Value</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Requests Per Minute (RPM)</td>
+                  <td><code>5</code></td>
+                  <td>Maximum requests allowed in a 60-second window.</td>
+                </tr>
+                <tr>
+                  <td>Requests Per Day (RPD)</td>
+                  <td><code>30</code></td>
+                  <td>Total daily request quota, resetting at UTC midnight.</td>
+                </tr>
+                <tr>
+                  <td>Server Concurrency</td>
+                  <td><code>5</code></td>
+                  <td>
+                    Maximum number of simultaneous code executions allowed on
+                    the server. If this limit is reached, you will receive a
+                    <code>503 Service Unavailable</code> error.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </section>
 
         <section id="limits">
@@ -357,51 +393,53 @@
             To maintain a secure and stable environment, the following resource
             limits are enforced on every execution:
           </p>
-          <table>
-            <thead>
-              <tr>
-                <th>Resource</th>
-                <th>Limit</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Execution Timeout</td>
-                <td><code>10 seconds</code></td>
-                <td>
-                  Your script will be terminated if it runs longer than 10
-                  seconds.
-                </td>
-              </tr>
-              <tr>
-                <td>Max Code Length</td>
-                <td><code>2000 characters</code></td>
-                <td>
-                  The <code>code</code> field in your JSON payload cannot exceed
-                  this length.
-                </td>
-              </tr>
-              <tr>
-                <td>Max Attachments</td>
-                <td><code>2 files</code></td>
-                <td>You can upload a maximum of two files per request.</td>
-              </tr>
-              <tr>
-                <td>Max File Size</td>
-                <td><code>8 MB per file</code></td>
-                <td>Each attached file cannot exceed 8 megabytes in size.</td>
-              </tr>
-              <tr>
-                <td>Max Child Processes</td>
-                <td><code>10</code></td>
-                <td>
-                  Your script is prevented from forking more than 10 child
-                  processes to protect against "fork bomb" attacks.
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Resource</th>
+                  <th>Limit</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Execution Timeout</td>
+                  <td><code>10 seconds</code></td>
+                  <td>
+                    Your script will be terminated if it runs longer than 10
+                    seconds.
+                  </td>
+                </tr>
+                <tr>
+                  <td>Max Code Length</td>
+                  <td><code>2000 characters</code></td>
+                  <td>
+                    The <code>code</code> field in your JSON payload cannot
+                    exceed this length.
+                  </td>
+                </tr>
+                <tr>
+                  <td>Max Attachments</td>
+                  <td><code>2 files</code></td>
+                  <td>You can upload a maximum of two files per request.</td>
+                </tr>
+                <tr>
+                  <td>Max File Size</td>
+                  <td><code>8 MB per file</code></td>
+                  <td>Each attached file cannot exceed 8 megabytes in size.</td>
+                </tr>
+                <tr>
+                  <td>Max Child Processes</td>
+                  <td><code>10</code></td>
+                  <td>
+                    Your script is prevented from forking more than 10 child
+                    processes to protect against "fork bomb" attacks.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </section>
 
         <section id="security">
@@ -467,52 +505,54 @@ print("Response JSON:", json.dumps(response.json(), indent=2))
         <section id="endpoint-details">
           <h2>Endpoint Details: <code>POST /execute</code></h2>
           <h3>Request Body Schema</h3>
-          <table>
-            <thead>
-              <tr>
-                <th>Field</th>
-                <th>Type</th>
-                <th>Required</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><code>code</code></td>
-                <td>String</td>
-                <td><strong>Yes</strong></td>
-                <td>
-                  The Python code to execute (max
-                  <strong>2000 characters</strong>).
-                </td>
-              </tr>
-              <tr>
-                <td><code>stdin_data</code></td>
-                <td>String</td>
-                <td>No</td>
-                <td>Text data passed to the script's standard input.</td>
-              </tr>
-              <tr>
-                <td><code>attachments</code></td>
-                <td>Array of Objects</td>
-                <td>No</td>
-                <td>
-                  Files to be made available. Max <strong>2 files</strong>,
-                  <strong>8MB</strong> each. Each object needs
-                  <code>filename</code> and <code>content_base_64</code> keys.
-                </td>
-              </tr>
-              <tr>
-                <td><code>return_files</code></td>
-                <td>Array of Strings</td>
-                <td>No</td>
-                <td>
-                  A list of filenames generated by the script to be returned in
-                  the response.
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Field</th>
+                  <th>Type</th>
+                  <th>Required</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>code</code></td>
+                  <td>String</td>
+                  <td><strong>Yes</strong></td>
+                  <td>
+                    The Python code to execute (max
+                    <strong>2000 characters</strong>).
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>stdin_data</code></td>
+                  <td>String</td>
+                  <td>No</td>
+                  <td>Text data passed to the script's standard input.</td>
+                </tr>
+                <tr>
+                  <td><code>attachments</code></td>
+                  <td>Array of Objects</td>
+                  <td>No</td>
+                  <td>
+                    Files to be made available. Max <strong>2 files</strong>,
+                    <strong>8MB</strong> each. Each object needs
+                    <code>filename</code> and <code>content_base_64</code> keys.
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>return_files</code></td>
+                  <td>Array of Strings</td>
+                  <td>No</td>
+                  <td>
+                    A list of filenames generated by the script to be returned
+                    in the response.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
           <h3>Allowed Libraries</h3>
           <p>
@@ -520,122 +560,129 @@ print("Response JSON:", json.dumps(response.json(), indent=2))
             third-party modules. Attempts to import any module not on this list
             will result in a <code>ForbiddenImportError</code>.
           </p>
-          <table>
-            <thead>
-              <tr>
-                <th>Category</th>
-                <th>Allowed Modules</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Key Third-Party Libraries</td>
-                <td><code>numpy</code></td>
-              </tr>
-              <tr>
-                <td>Media & Document Generation</td>
-                <td>
-                  <code>PIL (Pillow)</code>, <code>reportlab</code>,
-                  <code>fpdf</code>
-                </td>
-              </tr>
-              <tr>
-                <td>Data & Math</td>
-                <td>
-                  <code>math</code>, <code>statistics</code>,
-                  <code>decimal</code>, <code>fractions</code>,
-                  <code>numbers</code>, <code>random</code>
-                </td>
-              </tr>
-              <tr>
-                <td>Date & Time</td>
-                <td>
-                  <code>datetime</code>, <code>time</code>,
-                  <code>calendar</code>
-                </td>
-              </tr>
-              <tr>
-                <td>Text & Regex</td>
-                <td>
-                  <code>string</code>, <code>re</code>, <code>textwrap</code>,
-                  <code>unicodedata</code>
-                </td>
-              </tr>
-              <tr>
-                <td>Data Structures & Iteration</td>
-                <td>
-                  <code>collections</code>, <code>itertools</code>,
-                  <code>functools</code>, <code>operator</code>,
-                  <code>bisect</code>, <code>heapq</code>, <code>array</code>
-                </td>
-              </tr>
-              <tr>
-                <td>Security & Encoding</td>
-                <td>
-                  <code>hashlib</code>, <code>base64</code>, <code>uuid</code>,
-                  <code>secrets</code>
-                </td>
-              </tr>
-              <tr>
-                <td>Data Serialization</td>
-                <td><code>json</code>, <code>ast</code></td>
-              </tr>
-              <tr>
-                <td>General Utilities</td>
-                <td>
-                  <code>typing</code>, <code>enum</code>,
-                  <code>dataclasses</code>, <code>copy</code>,
-                  <code>pprint</code>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Allowed Modules</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Key Third-Party Libraries</td>
+                  <td><code>numpy</code></td>
+                </tr>
+                <tr>
+                  <td>Media & Document Generation</td>
+                  <td>
+                    <code>PIL (Pillow)</code>, <code>reportlab</code>,
+                    <code>fpdf</code>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Data & Math</td>
+                  <td>
+                    <code>math</code>, <code>statistics</code>,
+                    <code>decimal</code>, <code>fractions</code>,
+                    <code>numbers</code>, <code>random</code>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Date & Time</td>
+                  <td>
+                    <code>datetime</code>, <code>time</code>,
+                    <code>calendar</code>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Text & Regex</td>
+                  <td>
+                    <code>string</code>, <code>re</code>, <code>textwrap</code>,
+                    <code>unicodedata</code>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Data Structures & Iteration</td>
+                  <td>
+                    <code>collections</code>, <code>itertools</code>,
+                    <code>functools</code>, <code>operator</code>,
+                    <code>bisect</code>, <code>heapq</code>, <code>array</code>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Security & Encoding</td>
+                  <td>
+                    <code>hashlib</code>, <code>base64</code>, <code>uuid</code>,
+                    <code>secrets</code>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Data Serialization</td>
+                  <td><code>json</code>, <code>ast</code></td>
+                </tr>
+                <tr>
+                  <td>General Utilities</td>
+                  <td>
+                    <code>typing</code>, <code>enum</code>,
+                    <code>dataclasses</code>, <code>copy</code>,
+                    <code>pprint</code>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
           <h3>Error Responses</h3>
           <p>
             Errors are returned with a descriptive JSON body and an appropriate
             HTTP status code.
           </p>
-          <table>
-            <thead>
-              <tr>
-                <th>Status Code</th>
-                <th>Error Type</th>
-                <th>Reason</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><code>400 Bad Request</code></td>
-                <td><code>ValidationError</code></td>
-                <td>
-                  The request JSON is malformed, a file is too large, etc.
-                </td>
-              </tr>
-              <tr>
-                <td><code>400 Bad Request</code></td>
-                <td><code>ForbiddenImportError</code></td>
-                <td>The script attempts to import a disallowed module.</td>
-              </tr>
-              <tr>
-                <td><code>400 Bad Request</code></td>
-                <td><code>TimeoutError</code></td>
-                <td>Execution exceeded the 10-second time limit.</td>
-              </tr>
-              <tr>
-                <td><code>429 Too Many Requests</code></td>
-                <td><code>RateLimitExceeded</code></td>
-                <td>The per-minute or daily request limit has been reached.</td>
-              </tr>
-              <tr>
-                <td><code>503 Service Unavailable</code></td>
-                <td><code>ServerBusy</code></td>
-                <td>
-                  The server has reached its maximum concurrent execution limit.
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Status Code</th>
+                  <th>Error Type</th>
+                  <th>Reason</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>400 Bad Request</code></td>
+                  <td><code>ValidationError</code></td>
+                  <td>
+                    The request JSON is malformed, a file is too large, etc.
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>400 Bad Request</code></td>
+                  <td><code>ForbiddenImportError</code></td>
+                  <td>The script attempts to import a disallowed module.</td>
+                </tr>
+                <tr>
+                  <td><code>400 Bad Request</code></td>
+                  <td><code>TimeoutError</code></td>
+                  <td>Execution exceeded the 10-second time limit.</td>
+                </tr>
+                <tr>
+                  <td><code>429 Too Many Requests</code></td>
+                  <td><code>RateLimitExceeded</code></td>
+                  <td>
+                    The per-minute or daily request limit has been reached.
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>503 Service Unavailable</code></td>
+                  <td><code>ServerBusy</code></td>
+                  <td>
+                    The server has reached its maximum concurrent execution
+                    limit.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </section>
 
         <section id="example">
@@ -728,7 +775,7 @@ if response.status_code == 200:
     
     output_files = data.get('output_files', {})
     if 'output_grayscale.png' in output_files:
-        grayscale_data = base64.b64decode(output_files['output_grayscale.png'])
+        grayscale_data = base64.b64decode(output_files['output_grayscale.png']['content_base64'])
         with open(RESULT_IMAGE_PATH, "wb") as f:
             f.write(grayscale_data)
         print(f"> Success! Grayscale image saved to '{RESULT_IMAGE_PATH}'")
@@ -763,33 +810,25 @@ else:
         async function fetchDeveloperInfo() {
           const developerLink = document.getElementById("developer-link");
           if (!developerLink || !developerLink.href) {
-            console.error("Developer link with a valid href not found.");
             document.getElementById("developer-profile").style.display = "none";
             return;
           }
-
           const githubUrl = developerLink.href;
           const username = githubUrl.split("/").pop();
-
           if (!username) {
-            console.error("Could not parse username from developer link.");
             document.getElementById("developer-profile").style.display = "none";
             return;
           }
-
           const apiUrl = `https://api.github.com/users/${username}`;
-
           const linkEl = document.getElementById("dev-card-link");
           const avatarEl = document.getElementById("dev-avatar");
           const nameEl = document.getElementById("dev-name");
           const loginEl = document.getElementById("dev-login");
           const bioEl = document.getElementById("dev-bio");
-
           try {
             const response = await fetch(apiUrl);
             if (!response.ok) throw new Error("Network response was not ok");
             const data = await response.json();
-
             linkEl.href = data.html_url;
             avatarEl.src = data.avatar_url;
             avatarEl.alt = `${data.name || data.login}'s avatar`;
@@ -797,7 +836,6 @@ else:
             loginEl.textContent = `@${data.login}`;
             bioEl.textContent = data.bio || "Developer of this API.";
           } catch (error) {
-            console.error("Failed to fetch GitHub profile:", error);
             nameEl.textContent = username;
             loginEl.textContent = `@${username}`;
             bioEl.textContent =
@@ -805,26 +843,20 @@ else:
             linkEl.href = `https://github.com/${username}`;
           }
         }
-
         const baseUrl = window.location.origin;
         document.getElementById("baseUrl").textContent = baseUrl;
-
         const fullApiUrl = baseUrl + "/execute";
         document.querySelectorAll(".api-url-placeholder").forEach((el) => {
           el.textContent = fullApiUrl;
         });
-
         hljs.highlightAll();
-
         document.querySelectorAll("pre").forEach((preBlock) => {
           const codeBlock = preBlock.querySelector("code");
           if (!codeBlock) return;
-
           const copyButton = document.createElement("button");
           copyButton.className = "copy-btn";
           copyButton.textContent = "Copy";
           preBlock.appendChild(copyButton);
-
           copyButton.addEventListener("click", () => {
             navigator.clipboard
               .writeText(codeBlock.innerText)
@@ -839,7 +871,6 @@ else:
               });
           });
         });
-
         fetchDeveloperInfo();
       });
     </script>
