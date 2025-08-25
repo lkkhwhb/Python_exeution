@@ -11,7 +11,7 @@ A secure, versatile, and sandboxed Python code execution service exposed via a s
 
 This application is deployed and live on Render. You can start making requests immediately to the base URL:
 
-**`https://python-exeution.onrender.com`**
+https://python-exeution.onrender.com
 
 The documentation and a user-friendly interface are available at the base URL.
 
