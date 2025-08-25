@@ -339,11 +339,6 @@ Render will automatically clone the repository, set everything up, and run the a
 gunicorn main:app
 ```
 
----
-
-Do you want me to also make this **marketing-style** (like for a README) so it feels inviting to users who want a one-click deploy?
-
-
 ### 2. Local Development
 
 #### Prerequisites
