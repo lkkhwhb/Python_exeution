@@ -377,11 +377,16 @@ def handle_execute():
             active_subprocess_count -= 1
 
 if __name__ == '__main__':
+    if not os.path.exists(DATA_DIR):
+        os.makedirs(DATA_DIR)
     if not os.path.exists(TEMP_DIR):
         os.makedirs(TEMP_DIR)
+        
     cleanup_thread = threading.Thread(target=cleanup_task, daemon=True)
     cleanup_thread.start()
     logging.info("Background cleanup thread started.")
     if not IS_UNIX:
         logging.warning("Not running on a UNIX-like system. Fork bomb protection (process limits) will be disabled.")
-    app.run(host="0.0.0.0", debug=False)
+
+    app.run(host="0.0.0.0", port=5000, debug=False)
+
