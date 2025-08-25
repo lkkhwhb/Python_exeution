@@ -23,19 +23,25 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 app = Flask(__name__)
 CORS(app)
 
+DATA_DIR = os.environ.get("RENDER_DISK_PATH", "data")
+TEMP_DIR = os.path.join(DATA_DIR, "temp")
+DB_FILE = os.path.join(DATA_DIR, "ratelimit.db")
+
+os.makedirs(DATA_DIR, exist_ok=True)
+os.makedirs(TEMP_DIR, exist_ok=True)
+
 API_KEY = os.environ.get("PYTHON_EXE_KEY")
-TEMP_DIR = "temp"
 BURST_LIMIT = 5
 RPM_LIMIT = 5
 REFILL_RATE_PER_SECOND = RPM_LIMIT / 60.0
 RPD_LIMIT = 30
-DB_FILE = "ratelimit.db"
 MAX_ATTACHMENTS = 2
 MAX_FILE_SIZE_MB = 8
 MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
 MAX_CHILD_PROCESSES = 10
 MAX_CONCURRENT_SUBPROCESSES = 5
 CLEANUP_INTERVAL_SECONDS = 3600
+
 rate_limit_lock = threading.Lock()
 rate_limit_data = {}
 subprocess_lock = threading.Lock()
@@ -88,11 +94,11 @@ def cleanup_task():
         except Exception as e:
             logging.error(f"Error during database cleanup: {e}")
 
+cleanup_thread = threading.Thread(target=cleanup_task, daemon=True)
+cleanup_thread.start()
+logging.info("Background cleanup thread started.")
+
 def get_user_ip():
-    """
-    Gets the user's public IP address, trusting the X-Forwarded-For header
-    if the app is behind a reverse proxy.
-    """
     if 'X-Forwarded-For' in request.headers:
         return request.headers['X-Forwarded-For'].split(',')[0].strip()
     return request.remote_addr
@@ -175,7 +181,6 @@ def execute_code(code: str, execution_dir: str, is_admin: bool = False, stdin_da
             return {"success": False, "error_type": "SyntaxError", "error": f"Invalid Python syntax: {e}"}
     
     script_filename = os.path.join(execution_dir, "script.py")
-    
     preexec_fn = set_subprocess_limits if IS_UNIX else None
     
     try:
@@ -234,7 +239,6 @@ def handle_execute():
     else:
         ip = get_user_ip()
         user_info["ip_address"] = ip
-        user_info["rate_limit_minute"] = RPM_LIMIT
         user_info["daily_quota_limit"] = RPD_LIMIT
 
         rate_limit = check_rate_limit(ip)
@@ -356,8 +360,15 @@ def handle_execute():
 
                 if result["success"]:
                     response_data["status"] = "success"
-                    result["output_files"] = output_files
-                    response_data["execution_details"] = result
+                    execution_details = {
+                        "success": result.get("success"),
+                        "stdout": result.get("stdout"),
+                        "stderr": result.get("stderr"),
+                        "exit_code": result.get("exit_code"),
+                        "execution_duration_sec": result.get("execution_duration_sec"),
+                        "output_files": output_files
+                    }
+                    response_data["execution_details"] = execution_details
                     return jsonify(response_data), 200
                 else:
                     error_details = {"type": result.get("error_type", "RuntimeError"), "message": result.get("error")}
@@ -377,16 +388,7 @@ def handle_execute():
             active_subprocess_count -= 1
 
 if __name__ == '__main__':
-    if not os.path.exists(DATA_DIR):
-        os.makedirs(DATA_DIR)
-    if not os.path.exists(TEMP_DIR):
-        os.makedirs(TEMP_DIR)
-        
-    cleanup_thread = threading.Thread(target=cleanup_task, daemon=True)
-    cleanup_thread.start()
-    logging.info("Background cleanup thread started.")
     if not IS_UNIX:
-        logging.warning("Not running on a UNIX-like system. Fork bomb protection (process limits) will be disabled.")
-
+        logging.warning("Not running on a UNIX-like system. Fork bomb protection will be disabled.")
+    
     app.run(host="0.0.0.0", port=5000, debug=False)
-
