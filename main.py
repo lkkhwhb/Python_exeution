@@ -35,12 +35,11 @@ MAX_FILE_SIZE_MB = 8
 MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
 MAX_CHILD_PROCESSES = 10
 MAX_CONCURRENT_SUBPROCESSES = 5
+CLEANUP_INTERVAL_SECONDS = 3600
 rate_limit_lock = threading.Lock()
 rate_limit_data = {}
 subprocess_lock = threading.Lock()
 active_subprocess_count = 0
-
-CLEANUP_INTERVAL_SECONDS = 3600
 
 ALLOWED_PUBLIC_IMPORTS = {
     "math", "statistics", "decimal", "fractions", "numbers", "random", "numpy",
@@ -88,6 +87,15 @@ def cleanup_task():
                 logging.info(f"Database Cleanup: Removed {deleted_count} old daily limit records.")
         except Exception as e:
             logging.error(f"Error during database cleanup: {e}")
+
+def get_user_ip():
+    """
+    Gets the user's public IP address, trusting the X-Forwarded-For header
+    if the app is behind a reverse proxy.
+    """
+    if 'X-Forwarded-For' in request.headers:
+        return request.headers['X-Forwarded-For'].split(',')[0].strip()
+    return request.remote_addr
 
 def check_rate_limit(ip: str):
     with rate_limit_lock:
@@ -222,12 +230,9 @@ def handle_execute():
     is_admin = bool(API_KEY and data.get('api_key') == API_KEY)
 
     if is_admin:
-        user_info = {
-            "role": "admin",
-            "rate_limits_applied": False
-        }
+        user_info = {"role": "admin", "rate_limits_applied": False}
     else:
-        ip = request.remote_addr
+        ip = get_user_ip()
         user_info["ip_address"] = ip
         user_info["rate_limit_minute"] = RPM_LIMIT
         user_info["daily_quota_limit"] = RPD_LIMIT
@@ -281,7 +286,7 @@ def handle_execute():
                 processed_attachments = []
                 for attachment in attachments:
                     filename = attachment.get("filename")
-                    if not filename or ".." in filename or filename.startswith("/"):
+                    if not filename or ".." in filename or os.path.isabs(filename):
                         response_data["error_details"] = {"type": "ValidationError", "message": "Invalid or missing attachment filename."}
                         return jsonify(response_data), 400
                     
@@ -297,14 +302,13 @@ def handle_execute():
                         response_data["error_details"] = {"type": "ValidationError", "message": f"Invalid Base64 content for file '{safe_filename}'."}
                         return jsonify(response_data), 400
                     
-                    file_size = len(content_bytes)
-                    if file_size > MAX_FILE_SIZE_BYTES:
+                    if len(content_bytes) > MAX_FILE_SIZE_BYTES:
                         response_data["error_details"] = {"type": "ValidationError", "message": f"File '{safe_filename}' exceeds the size limit of {MAX_FILE_SIZE_MB}MB."}
                         return jsonify(response_data), 400
                     
                     with open(os.path.join(execution_dir, safe_filename), "wb") as f:
                         f.write(content_bytes)
-                    processed_attachments.append({"filename": safe_filename, "size_bytes": file_size})
+                    processed_attachments.append({"filename": safe_filename, "size_bytes": len(content_bytes)})
                 
                 request_context["processed_attachments"] = processed_attachments
                 
@@ -318,22 +322,33 @@ def handle_execute():
                 output_files = {}
                 if result["success"]:
                     files_to_return = data.get('return_files', [])
+                    abs_execution_dir = os.path.abspath(execution_dir)
+
                     for filename in files_to_return:
-                        safe_filename = os.path.basename(filename)
-                        filepath = os.path.join(execution_dir, safe_filename)
+                        if not filename or ".." in filename or os.path.isabs(filename):
+                            output_files[filename] = {"error": "Invalid filename. Path traversal is not allowed."}
+                            continue
+                        
+                        filepath = os.path.join(execution_dir, filename)
+                        abs_filepath = os.path.abspath(filepath)
+                        
+                        if not abs_filepath.startswith(abs_execution_dir):
+                            output_files[filename] = {"error": "Security violation: File is outside the allowed directory."}
+                            continue
+
                         if os.path.exists(filepath) and os.path.isfile(filepath):
                             file_size = os.path.getsize(filepath)
                             if file_size <= MAX_FILE_SIZE_BYTES:
                                 with open(filepath, "rb") as f:
                                     content_bytes = f.read()
-                                output_files[safe_filename] = {
+                                output_files[filename] = {
                                     "content_base64": base64.b64encode(content_bytes).decode('utf-8'),
                                     "size_bytes": file_size
                                 }
                             else:
-                                output_files[safe_filename] = {"error": "File is too large to return.", "size_bytes": file_size}
+                                output_files[filename] = {"error": "File is too large to return.", "size_bytes": file_size}
                         else:
-                            output_files[safe_filename] = {"error": "File not found after execution."}
+                            output_files[filename] = {"error": "File not found after execution."}
 
                 response_data["user_info"] = user_info
                 response_data["server_status"] = server_status
@@ -356,9 +371,6 @@ def handle_execute():
             except Exception as e:
                 logging.error(f"An unexpected error occurred in handle_execute: {e}")
                 response_data["error_details"] = {"type": "InternalServerError", "message": "An unexpected server error occurred."}
-                response_data["user_info"] = user_info
-                response_data["server_status"] = server_status
-                response_data["request_context"] = request_context
                 return jsonify(response_data), 500
     finally:
         with subprocess_lock:
@@ -372,4 +384,4 @@ if __name__ == '__main__':
     logging.info("Background cleanup thread started.")
     if not IS_UNIX:
         logging.warning("Not running on a UNIX-like system. Fork bomb protection (process limits) will be disabled.")
-    app.run(host="0.0.0.0", port=5000, debug=False)
+    app.run(host="0.0.0.0", debug=False)
