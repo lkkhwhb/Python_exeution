@@ -1,6 +1,6 @@
 Flask==3.0.3
 flask-cors==5.0.0
-numpy==1.26.4
+numpy==2.1.1
 requests==2.32.3
 reportlab==4.2.2
 fpdf2==2.7.9
