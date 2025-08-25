@@ -1,6 +1,6 @@
 # 🐍 Python Sandbox API
 
-[![Live Demo](https://img.shields.io/badge/Live_Demo-Online-brightgreen?style=for-the-badge&logo=render)](https://python-exeution.onrender.com)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Online-brightgreen?style=for-the-badge&logo=render)](https://python-execution.onrender.com)
 [![Language](https://img.shields.io/badge/Language-Python-blue?style=for-the-badge&logo=python)](https://www.python.org/)
 
 A secure, versatile, and sandboxed Python code execution service exposed via a simple RESTful API. This project allows you to safely execute untrusted Python code in an isolated environment, complete with support for file attachments, standard input, and retrieving output files.
@@ -11,7 +11,7 @@ A secure, versatile, and sandboxed Python code execution service exposed via a s
 
 This application is deployed and live on Render. You can start making requests immediately to the base URL:
 
-**`https://python-exeution.onrender.com`**
+**`https://python-execution.onrender.com`**
 
 The documentation and a user-friendly interface are available at the base URL.
 
@@ -23,6 +23,7 @@ The documentation and a user-friendly interface are available at the base URL.
 -   **File I/O**: Attach files to your request, process them in your script, and retrieve generated output files.
 -   **Resource Limiting**: Strict limits on execution time, code length, and process creation prevent abuse and infinite loops.
 -   **Curated Libraries**: Access a safe, curated list of popular libraries like `numpy` and `Pillow`, while blocking dangerous modules like `os` or `subprocess`.
+-   **Detailed Responses**: Get rich context with every request, including your current quota, server load, and request metadata.
 -   **Rate Limiting**: Per-IP rate limiting and daily quotas to prevent spam and ensure fair usage.
 -   **Concurrency Control**: The server actively manages load, returning a `503 Service Busy` error if too many processes are running concurrently.
 
@@ -58,33 +59,75 @@ Executes the provided Python code in a sandboxed environment.
 
 ### ✅ Successful Response (`200 OK`)
 
+A successful response contains metadata about the request, the user's quota, server status, and the complete execution result.
+
 ```json
 {
   "status": "success",
-  "timestamp_utc": "2023-10-28T12:00:00.123456+00:00",
+  "timestamp_utc": "2024-03-15T10:30:00.123456+00:00",
+  "user_info": {
+    "ip_address": "192.0.2.1",
+    "daily_quota_limit": 30,
+    "requests_today": 5,
+    "requests_remaining_today": 25
+  },
+  "server_status": {
+    "load": "normal",
+    "active_processes_at_request": 0,
+    "max_concurrent_processes": 5
+  },
+  "request_context": {
+    "code_length": 150,
+    "attachment_count": 1,
+    "stdin_provided": false,
+    "processed_attachments": [
+      { "filename": "input.txt", "size_bytes": 1024 }
+    ]
+  },
   "execution_details": {
-    "stdout": "Hello from the sandbox!\n",
+    "success": true,
+    "stdout": "Process finished.\n",
     "stderr": "",
     "exit_code": 0,
-    "execution_duration_sec": 0.0123,
+    "execution_duration_sec": 0.0456,
     "output_files": {
-      "output.txt": "VGhpcyBpcyB0aGUgY29udGVudCBvZiB0aGUgb3V0cHV0IGZpbGUu"
+      "result.txt": {
+        "content_base64": "SGVsbG8sIFdvcmxkIQ==",
+        "size_bytes": 13
+      }
     }
   }
 }
 ```
 
+| Top-Level Field     | Description                                                                                             |
+| ------------------- | ------------------------------------------------------------------------------------------------------- |
+| `status`            | Indicates the overall outcome. Always "success" for 200 OK.                                             |
+| `timestamp_utc`     | ISO 8601 timestamp of when the response was generated.                                                  |
+| `user_info`         | An object containing details about the user's quota. For admins, shows `rate_limits_applied: false`.    |
+| `server_status`     | Information about the server's load at the time of the request.                                         |
+| `request_context`   | Metadata about the request payload that was processed.                                                  |
+| `execution_details` | A detailed object containing the full output from the code execution.                                   |
+
+
 ### ❌ Error Response
 
-Errors are returned with an appropriate HTTP status code (e.g., `400`, `429`, `503`).
+Errors are returned with an appropriate HTTP status code and include user and server context where possible.
 
+**Example: Rate Limit Exceeded (`429`)**
 ```json
 {
   "status": "error",
-  "timestamp_utc": "2023-10-28T12:01:00.123456+00:00",
+  "timestamp_utc": "2024-03-15T11:00:00.987654+00:00",
   "error_details": {
-    "type": "ForbiddenImportError",
-    "message": "Disallowed imports: os."
+    "type": "RateLimitExceeded",
+    "message": "Daily quota of 30 exceeded."
+  },
+  "user_info": {
+    "ip_address": "192.0.2.1",
+    "daily_quota_limit": 30,
+    "requests_today": 30,
+    "requests_remaining_today": 0
   }
 }
 ```
@@ -122,7 +165,7 @@ A curated list of standard and third-party libraries is available. Any import no
 | Category                      | Allowed Modules                                                              |
 | ----------------------------- | ---------------------------------------------------------------------------- |
 | **Key Third-Party**           | `numpy`                                                                      |
-| **Media & Document Gen**      | `PIL (Pillow)`, `reportlab`, `fpdf`                                          |
+| **Media & Document Gen**      | `PIL (Pillow)`, `reportlab`, `fpdf2`                                         |
 | **Data, Math & Time**         | `math`, `statistics`, `decimal`, `random`, `datetime`, `time`                |
 | **Text, Regex & Data**        | `string`, `re`, `textwrap`, `json`, `ast`, `base64`, `hashlib`                |
 | **Data Structures & Utils**   | `collections`, `itertools`, `functools`, `operator`, `copy`, `pprint`        |
@@ -134,7 +177,7 @@ A curated list of standard and third-party libraries is available. Any import no
 ### Simple cURL Request
 
 ```bash
-curl -X POST https://python-exeution.onrender.com/execute \
+curl -X POST https://python-execution.onrender.com/execute \
 -H "Content-Type: application/json" \
 -d '{
   "code": "print(\"Hello from the sandbox!\")"
@@ -166,9 +209,21 @@ import requests
 import base64
 import json
 
-API_URL = 'https://python-exeution.onrender.com/execute'
+API_URL = 'https://python-execution.onrender.com/execute'
 LOCAL_IMAGE_PATH = 'my_photo.jpg' # Make sure this file exists locally
 RESULT_IMAGE_PATH = 'result_grayscale.png'
+
+# The sandbox script from step 1
+sandbox_code = """
+from PIL import Image
+try:
+    with Image.open('input_photo.jpg') as img:
+        grayscale_img = img.convert('L')
+        grayscale_img.save('output_grayscale.png')
+        print("Image successfully converted to grayscale.")
+except Exception as e:
+    print(f"An unexpected error occurred: {e}")
+"""
 
 # 1. Read local image and Base64 encode it
 with open(LOCAL_IMAGE_PATH, "rb") as image_file:
@@ -176,7 +231,7 @@ with open(LOCAL_IMAGE_PATH, "rb") as image_file:
 
 # 2. Construct the API payload
 payload = {
-    "code": sandbox_code, # The script from step 1
+    "code": sandbox_code,
     "attachments": [{
         "filename": "input_photo.jpg",
         "content_base_64": b64_content
@@ -186,22 +241,33 @@ payload = {
 
 # 3. Send the request
 response = requests.post(API_URL, json=payload)
+response_data = response.json()
 
-# 4. Process the response
+# 4. Process the new, detailed response structure
+print(f"API Response Code: {response.status_code}")
+
 if response.status_code == 200:
-    data = response.json()['execution_details']
     print("API Call Successful!")
-    print(f"  > Stdout: {data.get('stdout', '').strip()}")
+    user_info = response_data.get('user_info', {})
+    exec_details = response_data.get('execution_details', {})
     
-    output_files = data.get('output_files', {})
-    if 'output_grayscale.png' in output_files:
-        grayscale_data = base64.b64decode(output_files['output_grayscale.png'])
+    print(f"  > Requests remaining today: {user_info.get('requests_remaining_today', 'N/A')}")
+    print(f"  > Stdout: {exec_details.get('stdout', '').strip()}")
+    
+    output_files = exec_details.get('output_files', {})
+    file_info = output_files.get('output_grayscale.png', {})
+    b64_image_content = file_info.get('content_base64')
+
+    if b64_image_content:
+        grayscale_data = base64.b64decode(b64_image_content)
         with open(RESULT_IMAGE_PATH, "wb") as f:
             f.write(grayscale_data)
-        print(f"> Success! Grayscale image saved to '{RESULT_IMAGE_PATH}'")
+        print(f"  > Success! Grayscale image saved to '{RESULT_IMAGE_PATH}'")
+    else:
+        print(f"  > Error returning file: {file_info.get('error', 'Unknown file error')}")
 else:
-    print(f"API Error: {response.status_code}")
-    print(json.dumps(response.json(), indent=2))
+    print("API Error Details:")
+    print(json.dumps(response_data, indent=2))
 ```
 
 ---
@@ -209,14 +275,14 @@ else:
 ## 🔧 Local Development & Deployment
 
 ### Prerequisites
--   Python 3.8+
+-   Python 3.8+ (Python 3.12 recommended for stability)
 -   `pip` and `venv`
 
 ### Installation
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/your-username/python-sandbox-api.git
-    cd python-sandbox-api
+    git clone https://github.com/Bhargavxyz738/Python_exeution.git
+    cd Python-execution
     ```
 
 2.  **Create and activate a virtual environment:**
@@ -248,13 +314,17 @@ set PYTHON_EXE_KEY="your-secret-api-key"
 
 ### Running the Server
 ```bash
+# For development
 python app.py
+
+# For production (using Gunicorn)
+gunicorn --bind 0.0.0.0:5000 app:app
 ```
 The server will start on `http://127.0.0.1:5000`.
 
 ## 🤝 Contributing
 
-Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/Bhargavxyz738/Python-exeution/issues).
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/Bhargavxyz738/Python-execution/issues).
 
 ## 📄 License
 
