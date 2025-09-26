@@ -5,15 +5,22 @@
 
 A secure, versatile, and sandboxed Python code execution service exposed via a simple RESTful API. This project allows you to safely execute untrusted Python code in an isolated environment, complete with support for file attachments, standard input, and retrieving output files.
 
+This project was created with two main goals in mind:
+
+- AI Agents – Safely run dynamic Python code for automation, reasoning, and experimentation.
+- Small Python Projects – A lightweight environment to test and share scripts securely.
 ---
 
 ## ✨ Live Demo
 
-This application is deployed and live on Render. You can start making requests immediately to the base URL:
+You can try out the sandbox instantly on the hosted demo server:
 
-https://python-exeution.onrender.com
+**Base URL:**
+[https://python-exeution.onrender.com](https://python-exeution.onrender.com)
 
-The documentation and a user-friendly interface are available at the base URL.
+* A user-friendly web interface and documentation are available at the base URL.
+* This demo is **rate-limited** and provided mainly for **testing and exploration**.
+* For stable usage, we recommend running the server locally or deploying it yourself as an admin.
 
 > **Note:** The public API is open to everyone but is rate-limited to ensure fair usage and server stability. Please see the [Limits & Restrictions](#-limits--restrictions) section for more details.
 
