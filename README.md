@@ -11,7 +11,7 @@ This project was created with two main goals in mind:
 - Small Python Projects – A lightweight environment to test and share scripts securely.
 ---
 
-## ✨ Live Demo
+## Live Demo
 
 You can try out the sandbox instantly on the hosted demo server:
 
@@ -24,7 +24,7 @@ You can try out the sandbox instantly on the hosted demo server:
 
 > **Note:** The public API is open to everyone but is rate-limited to ensure fair usage and server stability. Please see the [Limits & Restrictions](#-limits--restrictions) section for more details.
 
-## 🚀 Features
+## Features
 
 -   **Secure Sandboxing**: Code is executed in an isolated, temporary environment with no network access and restricted filesystem permissions.
 -   **File I/O**: Attach files to your request, process them in your script, and retrieve generated output files, all in a single API call.
@@ -35,7 +35,7 @@ You can try out the sandbox instantly on the hosted demo server:
 -   **Robust Rate Limiting**: Per-IP rate limiting and daily quotas to prevent spam and ensure fair usage.
 -   **Concurrency Control**: The server actively manages load, returning a `503 Service Busy` error if too many processes are running concurrently.
 
-## 🛡️ Security Model
+## Security Model
 
 Security is the primary design goal. Every execution is constrained by:
 -   **No Network Access**: Scripts are blocked from making any outbound network calls.
@@ -45,7 +45,7 @@ Security is the primary design goal. Every execution is constrained by:
 -   **Ephemeral Environment**: The entire execution context is destroyed after each API call, ensuring no data persists between requests.
 -   **Robust IP Detection**: Correctly identifies user IPs even behind a reverse proxy by trusting the `X-Forwarded-For` header.
 
-## 📋 API Documentation
+## API Documentation
 
 ### Endpoint: `POST /execute`
 
@@ -67,7 +67,7 @@ Executes the provided Python code in a sandboxed environment.
 
 ---
 
-## 💻 How to Use the API
+## How to Use the API
 
 All examples use `curl` for simplicity. The base URL is `https://python-exeution-mgoh.onrender.com//execute`.
 
