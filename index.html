@@ -1,47 +1,60 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>Python Sandbox API Documentation</title>
+    <title>Python Sandbox API | AI Code Execution & Function Calling</title>
     <meta
       name="description"
-      content="Official documentation for the Python Sandbox API. Run Python code safely in a sandboxed environment with file support, rate limiting, and strict resource controls."
+      content="Official documentation for the Python Sandbox API. Designed for AI agents, LLM function calling, and creative applications requiring secure, remote Python code execution."
     />
     <meta
       name="keywords"
-      content="Python API, sandbox, secure code execution, REST API, Flask, requests, numpy, fpdf, reportlab"
+      content="Python API, sandbox, secure code execution, AI agents, LLM function calling, remote python server, REST API"
     />
     <meta name="author" content="Bhargav Barman" />
     <meta name="robots" content="index, follow" />
-    <link rel="canonical" href="https://your-domain.com/" />
-    <meta name="theme-color" content="#0d1117" />
+    <meta name="theme-color" content="#ffffff" id="meta-theme-color" />
     <meta name="color-scheme" content="light dark" />
-    <meta name="application-name" content="Python Sandbox API" />
-    <meta name="apple-mobile-web-app-title" content="Python Sandbox" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <link
-      rel="icon"
-      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐍</text></svg>"
-    />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark-dimmed.min.css"
+      id="hljs-theme"
     />
     <script
       defer
       src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"
     ></script>
+
     <style>
       :root {
+        --bg-color: #0d1117;
+        --text-color: #c9d1d9;
+        --text-color-light: #8b949e;
+        --header-color: #ffffff;
+        --border-color: #30363d;
+        --link-color: #58a6ff;
+        --note-bg-color: #161b22;
+        --note-border-color: #58a6ff;
+        --ai-border-color: #bc8cff;
+        --ai-glow: rgba(188, 140, 255, 0.15);
+        --inline-code-bg: rgba(110, 118, 129, 0.4);
+        --code-bg-color: #010409;
+        --code-border-color: #21262d;
+        --btn-bg: #21262d;
+        --btn-hover: #30363d;
+        --shadow-elevation: 0 8px 24px rgba(0, 0, 0, 0.2);
+        --status-dot: #238636;
+      }
+
+      [data-theme="light"] {
         --bg-color: #ffffff;
         --text-color: #24292e;
         --text-color-light: #57606a;
@@ -50,18 +63,42 @@
         --link-color: #0969da;
         --note-bg-color: #f6f8fa;
         --note-border-color: #0969da;
+        --ai-border-color: #8a2be2;
+        --ai-glow: rgba(138, 43, 226, 0.1);
         --inline-code-bg: rgba(175, 184, 193, 0.2);
-        --code-bg-color: #0d1117;
-        --code-text-color: #c9d1d9;
-        --code-border-color: #30363d;
-        --code-copy-btn-bg: #21262d;
-        --code-copy-btn-hover-bg: #30363d;
-      } 
-      * ::-webkit-scrollbar {
-        display: none;
+        --code-bg-color: #f6f8fa;
+        --code-border-color: #d0d7de;
+        --btn-bg: #f3f4f6;
+        --btn-hover: #e5e7eb;
+        --shadow-elevation: 0 4px 12px rgba(0, 0, 0, 0.08);
+        --status-dot: #2da44e;
       }
+
+      html {
+        scroll-padding-top: 80px;
+      }
+
+      html.smooth-scroll {
+        scroll-behavior: smooth;
+      }
+
+      ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--bg-color);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: 5px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--text-color-light);
+      }
+
       body {
-        font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI",
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
           Helvetica, Arial, sans-serif;
         line-height: 1.7;
         color: var(--text-color);
@@ -69,293 +106,554 @@
         margin: 0;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
+        transition: background-color 0.3s ease, color 0.3s ease;
       }
-      .container {
-        max-width: 900px;
-        margin: 0 auto;
-        padding: 0 20px;
-      }
-      .page-header,
-      .page-footer {
+
+      .top-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 5%;
+        border-bottom: 1px solid var(--border-color);
         background-color: var(--note-bg-color);
-        border-bottom: 1px solid var(--border-color);
-        padding: 20px 0;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        backdrop-filter: blur(10px);
+        background-color: color-mix(in srgb, var(--note-bg-color) 90%, transparent);
       }
-      .page-footer {
-        border-top: 1px solid var(--border-color);
-        border-bottom: none;
-        margin-top: 80px;
-        font-size: 0.9em;
-        color: var(--text-color-light);
-        text-align: center;
-      }
-      h1,
-      h2,
-      h3 {
-        color: var(--header-color);
-        border-bottom: 1px solid var(--border-color);
-        padding-bottom: 10px;
+
+      .nav-brand {
+        font-size: 1.2em;
         font-weight: 700;
+        color: var(--header-color);
+        display: flex;
+        align-items: center;
+        gap: 8px;
       }
-      h1 {
-        font-size: 2.5em;
+
+      .nav-controls {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .api-status {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85em;
+        font-weight: 600;
+        color: var(--text-color-light);
+        padding: 4px 10px;
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        background: var(--bg-color);
+        text-decoration: none;
+        transition: all 0.2s ease;
+      }
+      .api-status:hover {
+        border-color: var(--status-dot);
+        color: var(--text-color);
+      }
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        background-color: var(--status-dot);
+        border-radius: 50%;
+        box-shadow: 0 0 8px var(--status-dot);
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(45, 164, 78, 0.4); }
+        70% { box-shadow: 0 0 0 6px rgba(45, 164, 78, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(45, 164, 78, 0); }
+      }
+
+      .github-nav-link {
+        color: var(--text-color-light);
+        display: flex;
+        align-items: center;
+        transition: color 0.2s ease, transform 0.2s ease;
+      }
+      
+      .github-nav-link:hover {
+        color: var(--text-color);
+        transform: scale(1.1);
+      }
+      
+      .github-nav-link svg {
+        width: 22px;
+        height: 22px;
+        fill: currentColor;
+      }
+
+      .theme-toggle {
+        background: none;
+        border: none;
+        color: var(--text-color-light);
+        cursor: pointer;
+        padding: 6px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+      }
+      .theme-toggle:hover {
+        background-color: var(--btn-hover);
+        color: var(--text-color);
+      }
+      .theme-toggle svg {
+        width: 20px;
+        height: 20px;
+        fill: currentColor;
+      }
+
+      .hero {
+        padding: 70px 5%;
+        text-align: center;
+        background: radial-gradient(circle at center, var(--ai-glow) 0%, transparent 70%);
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .hero h1 {
+        font-size: 3em;
+        margin-bottom: 15px;
         border-bottom: none;
+        letter-spacing: -0.02em;
       }
-      h2 {
-        font-size: 1.8em;
-        margin-top: 50px;
+
+      .hero p {
+        font-size: 1.2em;
+        color: var(--text-color-light);
+        max-width: 700px;
+        margin: 0 auto;
       }
-      h3 {
-        font-size: 1.4em;
+
+      .hero-cta {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
         margin-top: 30px;
-        border-bottom: none;
-        font-weight: 500;
       }
-      a {
-        color: var(--link-color);
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        font-size: 1em;
+      }
+
+      .btn-primary {
+        background-color: var(--text-color);
+        color: var(--bg-color);
+        border: 1px solid var(--text-color);
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-elevation);
         text-decoration: none;
       }
-      a:hover {
-        text-decoration: underline;
+
+      .btn-secondary {
+        background-color: transparent;
+        color: var(--text-color);
+        border: 1px solid var(--border-color);
       }
-      strong {
-        font-weight: 700;
+
+      .btn-secondary:hover {
+        background-color: var(--btn-hover);
+        border-color: var(--text-color-light);
+        transform: translateY(-2px);
+        text-decoration: none;
       }
-      main {
-        padding-top: 40px;
+
+      .btn-secondary svg {
+        width: 18px;
+        height: 18px;
+        fill: currentColor;
       }
-      code,
-      pre {
-        font-family: "Roboto Mono", "SFMono-Regular", Consolas,
-          "Liberation Mono", Menlo, Courier, monospace;
+
+      .content-wrapper {
+        display: flex;
+        gap: 50px;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 5%;
       }
+
+      .main-content {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .sidebar {
+        width: 260px;
+        flex-shrink: 0;
+      }
+
+      .toc-container {
+        position: sticky;
+        top: 100px;
+        max-height: calc(100vh - 120px);
+        overflow-y: auto;
+        background: var(--bg-color);
+        padding: 10px 0;
+      }
+
+      .toc-container h3 {
+        font-size: 0.9em;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-color-light);
+        margin-top: 0;
+        border-bottom: none;
+        padding-left: 10px;
+      }
+
+      .toc-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .toc-list li {
+        margin-bottom: 4px;
+      }
+
+      .toc-link {
+        display: block;
+        padding: 8px 10px;
+        color: var(--text-color);
+        text-decoration: none;
+        font-size: 0.95em;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+        border-left: 2px solid transparent;
+      }
+
+      .toc-link:hover {
+        background-color: var(--btn-hover);
+        text-decoration: none;
+      }
+
+      .toc-link.active {
+        color: var(--ai-border-color);
+        font-weight: 600;
+        background-color: var(--ai-glow);
+        border-left: 2px solid var(--ai-border-color);
+      }
+
+      h2, h3 {
+        color: var(--header-color);
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 8px;
+        font-weight: 600;
+        margin-top: 40px;
+      }
+      h2 { font-size: 1.8em; }
+      h3 { font-size: 1.4em; border-bottom: none; }
+
+      a { color: var(--link-color); text-decoration: none; }
+      a:hover { text-decoration: underline; }
+
+      code, pre {
+        font-family: "JetBrains Mono", Consolas, "Liberation Mono", monospace;
+      }
+
       code {
         background-color: var(--inline-code-bg);
         padding: 0.2em 0.4em;
-        margin: 0;
         font-size: 85%;
         border-radius: 6px;
+        word-break: break-word;
       }
+
       pre {
         background-color: var(--code-bg-color);
         border: 1px solid var(--code-border-color);
-        border-radius: 6px;
+        border-radius: 8px;
         padding: 16px;
         overflow-x: auto;
         position: relative;
+        transition: border-color 0.3s ease;
       }
-      pre code.hljs {
-        color: var(--code-text-color);
-        padding: 0;
-        margin: 0;
-        font-size: 100%;
+      
+      pre:hover {
+        border-color: var(--text-color-light);
+      }
+
+      pre code {
         background-color: transparent;
-        border: none;
+        padding: 0;
       }
+
       .copy-btn {
         position: absolute;
         top: 12px;
         right: 12px;
-        background-color: var(--code-copy-btn-bg);
+        background-color: var(--btn-bg);
         color: var(--text-color-light);
         border: 1px solid var(--code-border-color);
         border-radius: 6px;
-        padding: 4px 8px;
-        font-size: 12px;
+        padding: 6px;
         cursor: pointer;
         opacity: 0;
-        transition: opacity 0.2s ease-in-out;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
       }
-      pre:hover .copy-btn {
-        opacity: 1;
+      .copy-btn svg { width: 16px; height: 16px; fill: currentColor; }
+      pre:hover .copy-btn, .copy-btn:focus { opacity: 1; }
+      .copy-btn:hover { background-color: var(--btn-hover); color: var(--text-color); }
+
+      .code-tabs {
+        margin-top: 20px;
+        border: 1px solid var(--code-border-color);
+        border-radius: 8px;
+        overflow: hidden;
       }
+      .tab-headers {
+        display: flex;
+        background-color: var(--note-bg-color);
+        border-bottom: 1px solid var(--code-border-color);
+      }
+      .tab-btn {
+        background: none;
+        border: none;
+        padding: 10px 20px;
+        color: var(--text-color-light);
+        cursor: pointer;
+        font-size: 0.9em;
+        font-family: "Inter", sans-serif;
+        font-weight: 500;
+        border-bottom: 2px solid transparent;
+        transition: all 0.2s ease;
+      }
+      .tab-btn:hover { color: var(--text-color); }
+      .tab-btn.active {
+        color: var(--ai-border-color);
+        border-bottom-color: var(--ai-border-color);
+        background-color: var(--bg-color);
+      }
+      .tab-pane { display: none; }
+      .tab-pane.active { display: block; }
+      .tab-pane pre { border: none; border-radius: 0; margin: 0; }
+
       .table-wrapper {
         overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
         border: 1px solid var(--border-color);
-        border-radius: 6px;
+        border-radius: 8px;
         margin: 20px 0;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
       }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        min-width: 650px;
+      .table-wrapper:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-elevation);
       }
-      th,
-      td {
-        padding: 12px 15px;
-        border: 1px solid var(--border-color);
-        text-align: left;
-        vertical-align: top;
-      }
-      th {
-        background-color: var(--note-bg-color);
-        font-weight: 500;
-      }
-      td code {
-        margin-right: 4px;
-      }
+      table { width: 100%; border-collapse: collapse; min-width: 600px; }
+      th, td { padding: 14px 16px; border-bottom: 1px solid var(--border-color); text-align: left; }
+      th { background-color: var(--note-bg-color); font-weight: 600; white-space: nowrap; }
+      tr:last-child td { border-bottom: none; }
+
       .note {
         background-color: var(--note-bg-color);
         border-left: 4px solid var(--note-border-color);
-        padding: 1px 20px;
+        padding: 15px 20px;
         margin: 25px 0;
-        border-radius: 0 6px 6px 0;
+        border-radius: 0 8px 8px 0;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
       }
-      #toc ul {
-        list-style: none;
-        padding-left: 0;
+      .note:hover {
+        transform: translateX(4px);
+        box-shadow: var(--shadow-elevation);
       }
-      #toc li {
-        margin-bottom: 8px;
-      }
-      #developer-profile {
-        margin-bottom: 40px;
-      }
-      .dev-card-link {
-        display: block;
-        margin-top: 15px;
-        text-decoration: none;
-        color: inherit;
-      }
-      .dev-card {
+      .note.ai-note { border-left-color: var(--ai-border-color); }
+      .note p:first-child { margin-top: 0; }
+      .note p:last-child { margin-bottom: 0; }
+
+      details {
         background-color: var(--note-bg-color);
         border: 1px solid var(--border-color);
         border-radius: 8px;
-        padding: 20px;
+        padding: 10px 20px;
+        margin: 20px 0;
+        transition: all 0.3s ease;
+      }
+      summary {
+        font-weight: 600;
+        cursor: pointer;
+        outline: none;
+        color: var(--header-color);
+        user-select: none;
+      }
+      details[open] { padding-bottom: 20px; }
+      details pre { margin-top: 15px; margin-bottom: 0; }
+
+      .dev-card {
+        background-color: var(--bg-color);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 24px;
         display: flex;
         align-items: center;
         gap: 20px;
-        transition: box-shadow 0.2s ease-in-out;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        margin-top: 20px;
       }
-      .dev-card-link:hover .dev-card {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      a.dev-card-link { text-decoration: none; color: inherit; display: block; }
+      a.dev-card-link:hover .dev-card {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-elevation);
+        border-color: var(--text-color-light);
       }
-      .dev-avatar {
-        width: 80px;
-        height: 80px;
+      .dev-avatar { width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--border-color); }
+      .dev-info h3 { margin: 0; border: none; font-size: 1.4em; }
+      .dev-info .dev-login { color: var(--text-color-light); margin: 4px 0 8px 0; font-family: "JetBrains Mono", monospace; font-size: 0.9em; }
+      .dev-info .dev-bio { margin: 0; line-height: 1.5; }
+
+      #back-to-top {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 45px;
+        height: 45px;
+        background-color: var(--btn-bg);
+        border: 1px solid var(--border-color);
         border-radius: 50%;
-        border: 2px solid var(--border-color);
-        flex-shrink: 0;
-      }
-      .dev-info h3,
-      .dev-info p {
-        margin: 0;
-        padding: 0;
-        border: none;
-      }
-      .dev-info h3 {
-        font-size: 1.5em;
-        color: var(--header-color);
-      }
-      .dev-info .dev-login {
-        font-size: 1.1em;
-        color: var(--text-color-light);
-        margin-bottom: 8px;
-      }
-      .dev-info .dev-bio {
-        font-size: 1em;
         color: var(--text-color);
-        line-height: 1.5;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        z-index: 1000;
+        box-shadow: var(--shadow-elevation);
       }
-      @media (max-width: 768px) {
-        body {
-          line-height: 1.6;
-        }
-        .container {
-          padding: 0 15px;
-        }
-        h1 {
-          font-size: 2em;
-        }
-        h2 {
-          font-size: 1.6em;
-          margin-top: 40px;
-        }
-        h3 {
-          font-size: 1.3em;
-        }
-        .dev-card {
-          flex-direction: column;
-          text-align: center;
-        }
+      #back-to-top.show { opacity: 1; visibility: visible; }
+      #back-to-top:hover { background-color: var(--btn-hover); transform: translateY(-3px); }
+      #back-to-top svg { width: 20px; height: 20px; fill: currentColor; }
+
+      .page-footer {
+        border-top: 1px solid var(--border-color);
+        padding: 40px 5%;
+        margin-top: 60px;
+        text-align: center;
+        color: var(--text-color-light);
+        font-size: 0.9em;
+      }
+
+      @media (max-width: 900px) {
+        .content-wrapper { flex-direction: column; padding: 20px 5%; }
+        .sidebar { width: 100%; }
+        .toc-container { position: static; max-height: none; padding: 20px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 30px; }
+        .hero h1 { font-size: 2.2em; }
+        .hero-cta { flex-direction: column; width: 100%; max-width: 300px; margin: 30px auto 0; }
+        .hero-cta .btn { width: 100%; justify-content: center; box-sizing: border-box; }
+        .dev-card { flex-direction: column; text-align: center; }
+        .copy-btn { opacity: 1; background: var(--bg-color); }
+        #back-to-top { bottom: 20px; right: 20px; }
       }
     </style>
   </head>
   <body>
-    <header class="page-header">
-      <div class="container">
-        <h1>🐍 Python Sandbox API</h1>
-        <p style="font-size: 1.1em; color: var(--text-color-light)">
-          Secure, versatile, and sandboxed Python code execution via a simple
-          RESTful API.
-        </p>
+    <nav class="top-nav">
+      <div class="nav-brand">
+        🐍 Python Sandbox API
+      </div>
+      <div class="nav-controls">
+        <a href="https://stats.uptimerobot.com/Utp5g3XOfW" class="api-status" title="API Status" target="_blank" rel="noopener noreferrer">
+          <span class="status-dot"></span> Operational
+        </a>
+        
+        <a href="https://github.com/lkkhwhb/Python_exeution" target="_blank" rel="noopener noreferrer" class="github-nav-link" aria-label="View on GitHub" title="View source on GitHub">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.49.5.09.682-.217.682-.48 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.09.39-1.988 1.029-2.688-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.379.203 2.394.1 2.647.64.7 1.028 1.598 1.028 2.688 0 3.84-2.337 4.687-4.565 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.577.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"/>
+          </svg>
+        </a>
+
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle Theme">
+          <svg id="theme-icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display: block;">
+            <path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/>
+          </svg>
+          <svg id="theme-icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display: none;">
+            <path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.03-.39-1.41 0-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.03-.39-1.41 0-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0 .39-.39.39-1.03 0-1.41l-1.06-1.06zm1.06-10.96c.39-.39.39-1.03 0-1.41-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36c.39-.39.39-1.03 0-1.41-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/>
+          </svg>
+        </button>
+      </div>
+    </nav>
+
+    <header class="hero">
+      <h1>AI-Native Python Execution</h1>
+      <p>
+        Secure, versatile, and sandboxed Python code execution built specifically for Large Language Models, autonomous agents, and creative remote processing.
+      </p>
+      
+      <div class="hero-cta">
+        <a href="#making-requests" class="btn btn-primary">Get Started</a>
+        <a href="https://github.com/lkkhwhb/Python_exeution" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.49.5.09.682-.217.682-.48 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.09.39-1.988 1.029-2.688-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.379.203 2.394.1 2.647.64.7 1.028 1.598 1.028 2.688 0 3.84-2.337 4.687-4.565 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.577.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"/>
+          </svg>
+          Star on GitHub
+        </a>
       </div>
     </header>
 
-    <main>
-      <div class="container">
-        <section id="developer-profile">
-          <h2>Meet the Developer</h2>
-          <a
-            href="#"
-            target="_blank"
-            rel="noopener noreferrer"
-            id="dev-card-link"
-            class="dev-card-link"
-          >
-            <div class="dev-card">
-              <img
-                src=""
-                alt="Developer Avatar"
-                id="dev-avatar"
-                class="dev-avatar"
-                style="background-color: #e1e4e8"
-              />
-              <div class="dev-info">
-                <h3 id="dev-name">Loading...</h3>
-                <p class="dev-login" id="dev-login"></p>
-                <p class="dev-bio" id="dev-bio">
-                  Fetching developer profile from GitHub...
-                </p>
-              </div>
-            </div>
-          </a>
-        </section>
-
-        <nav id="toc">
+    <div class="content-wrapper">
+      <aside class="sidebar">
+        <nav class="toc-container">
           <h3>On this page</h3>
-          <ul>
-            <li><a href="#introduction">Introduction</a></li>
-            <li><a href="#base-url">Base URL & Rate Limits</a></li>
-            <li><a href="#limits">Execution & Resource Limits</a></li>
-            <li><a href="#security">Security & Sandbox Model</a></li>
-            <li><a href="#making-requests">Making Requests</a></li>
-            <li><a href="#endpoint-details">Endpoint Details</a></li>
-            <li><a href="#example">Complete Example</a></li>
+          <ul class="toc-list" id="toc-list">
+            <li><a href="#introduction" class="toc-link">Introduction & AI Agent Use Cases</a></li>
+            <li><a href="#base-url" class="toc-link">Base URL & Rate Limits</a></li>
+            <li><a href="#limits" class="toc-link">Execution & Resource Limits</a></li>
+            <li><a href="#security" class="toc-link">Security & Sandbox Model</a></li>
+            <li><a href="#making-requests" class="toc-link">Making Requests</a></li>
+            <li><a href="#endpoint-details" class="toc-link">Endpoint Details</a></li>
+            <li><a href="#example" class="toc-link">Complete Example</a></li>
+            <li><a href="#developer-profile" class="toc-link">Meet the Developer</a></li>
           </ul>
         </nav>
+      </aside>
 
-        <section id="introduction">
-          <h2>Introduction</h2>
+      <main class="main-content">
+        
+        <section id="introduction" class="scroll-section">
+          <h2>Introduction & AI Agent Use Cases</h2>
           <p>
-            The Python Sandbox API provides a sandboxed environment to run
-            Python code remotely. Each request is executed in a temporary,
-            isolated environment with strict resource limits and security
-            policies. You can upload files, execute code that processes them,
-            and retrieve the generated output files, all in a single API call.
+            The Python Sandbox API provides a highly secure environment to run Python code remotely. It is engineered specifically to act as a <strong>code interpreter and function-calling tool for Large Language Models (LLMs)</strong>.
+          </p>
+          <div class="note ai-note">
+            <p><strong>🎯 Built for AI Function Calling (Tool Use)</strong></p>
+            <p>
+              Provide this API as a tool to LLMs (like GPT-4, Claude, or Gemini). When the AI needs to process data, generate PDFs, manipulate images, or run complex algorithms, it can dynamically write a Python script, construct the JSON payload, send it to this API, and parse the resulting stdout or files—all in a secure container.
+            </p>
+          </div>
+          <p>
+            Each request runs in a temporary, isolated environment with strict resource constraints. You can upload files via Base64, execute AI-generated scripts to process those files, and retrieve the output seamlessly in a single synchronous API call.
           </p>
         </section>
 
-        <section id="base-url">
+        <section id="base-url" class="scroll-section">
           <h2>Base URL & Rate Limits</h2>
           <p>
-            All API requests are made to the base URL, which is dynamically
-            detected below. The public API is open and does not require an API
-            key, but is rate-limited by IP address to ensure fair usage and
-            server stability.
+            All API requests are made to the base URL. 
           </p>
-          <pre><code id="baseUrl"></code></pre>
+          <pre><code id="baseUrl" class="language-plaintext"></code></pre>
           <div class="table-wrapper">
             <table>
               <thead>
@@ -367,22 +665,20 @@
               </thead>
               <tbody>
                 <tr>
-                  <td>Requests Per Minute (RPM)</td>
-                  <td><code>5</code></td>
+                  <td>Requests Per Minute</td>
+                  <td><code>5 RPM</code></td>
                   <td>Maximum requests allowed in a 60-second window.</td>
                 </tr>
                 <tr>
-                  <td>Requests Per Day (RPD)</td>
-                  <td><code>30</code></td>
+                  <td>Requests Per Day</td>
+                  <td><code>30 RPD</code></td>
                   <td>Total daily request quota, resetting at UTC midnight.</td>
                 </tr>
                 <tr>
                   <td>Server Concurrency</td>
                   <td><code>5</code></td>
                   <td>
-                    Maximum number of simultaneous code executions allowed on
-                    the server. If this limit is reached, you will receive a
-                    <code>503 Service Unavailable</code> error.
+                    Simultaneous executions allowed. Ensure your AI agents implement retry logic for <code>503</code> errors.
                   </td>
                 </tr>
               </tbody>
@@ -390,11 +686,10 @@
           </div>
         </section>
 
-        <section id="limits">
+        <section id="limits" class="scroll-section">
           <h2>Execution & Resource Limits</h2>
           <p>
-            To maintain a secure and stable environment, the following resource
-            limits are enforced on every execution:
+            To maintain a secure and stable environment for remote execution, the following resource limits are strictly enforced:
           </p>
           <div class="table-wrapper">
             <table>
@@ -409,160 +704,117 @@
                 <tr>
                   <td>Execution Timeout</td>
                   <td><code>10 seconds</code></td>
-                  <td>
-                    Your script will be terminated if it runs longer than 10
-                    seconds.
-                  </td>
+                  <td>Script will be forcibly terminated if it exceeds time.</td>
                 </tr>
                 <tr>
                   <td>Max Code Length</td>
-                  <td><code>2000 characters</code></td>
-                  <td>
-                    The <code>code</code> field in your JSON payload cannot
-                    exceed this length.
-                  </td>
+                  <td><code>2000 chars</code></td>
+                  <td>Prompt your AI to write concise scripts.</td>
                 </tr>
                 <tr>
                   <td>Max Attachments</td>
                   <td><code>2 files</code></td>
-                  <td>You can upload a maximum of two files per request.</td>
+                  <td>Maximum files uploaded per execution.</td>
                 </tr>
                 <tr>
                   <td>Max File Size</td>
-                  <td><code>8 MB per file</code></td>
-                  <td>Each attached file cannot exceed 8 megabytes in size.</td>
-                </tr>
-                <tr>
-                  <td>Max Child Processes</td>
-                  <td><code>10</code></td>
-                  <td>
-                    Your script is prevented from forking more than 10 child
-                    processes to protect against "fork bomb" attacks.
-                  </td>
+                  <td><code>8 MB</code></td>
+                  <td>Each attached file must remain under 8 megabytes.</td>
                 </tr>
               </tbody>
             </table>
           </div>
         </section>
 
-        <section id="security">
+        <section id="security" class="scroll-section">
           <h2>Security & Sandbox Model</h2>
           <p>
-            Every code execution is heavily sandboxed with the following
-            restrictions:
+            Because this API executes arbitrary code, it employs an aggressive sandboxing strategy:
           </p>
           <ul>
-            <li>
-              <strong>No Network Access:</strong> Scripts cannot make outbound
-              network requests.
-            </li>
-            <li>
-              <strong>Filesystem Isolation:</strong> Code runs in a temporary
-              directory and has no access to the underlying server filesystem.
-            </li>
-            <li>
-              <strong>Import Restrictions:</strong> Only a curated list of safe
-              libraries is available. Modules that could compromise security
-              (e.g., <code>os</code>, <code>sys</code>) are forbidden.
-            </li>
-            <li>
-              <strong>Resource Limits:</strong> Each execution is constrained by
-              the time, process, and memory limits detailed above.
-            </li>
-            <li>
-              <strong>Ephemeral Environment:</strong> The execution directory
-              and all its contents are permanently deleted immediately after the
-              request is completed.
-            </li>
+            <li><strong>No Network Access:</strong> Scripts cannot make outbound network requests.</li>
+            <li><strong>Filesystem Isolation:</strong> Code executes inside a temporary directory.</li>
+            <li><strong>Import Restrictions:</strong> Only a curated list of safe libraries is available (e.g., <code>os</code>, <code>subprocess</code> are forbidden).</li>
+            <li><strong>Ephemeral Environment:</strong> The sandbox directory is permanently destroyed instantly after the HTTP request concludes.</li>
           </ul>
         </section>
 
-        <section id="making-requests">
+        <section id="making-requests" class="scroll-section">
           <h2>Making Requests</h2>
           <p>
-            All requests to the <code>/execute</code> endpoint must be a
-            <code>POST</code> request with a JSON body.
+            All requests to the <code>/execute</code> endpoint must be a <code>POST</code> request containing a JSON payload.
           </p>
-          <h3>Using cURL</h3>
-          <pre><code class="language-bash">curl -X POST <span class="api-url-placeholder"></span> \
+          
+          <div class="code-tabs">
+            <div class="tab-headers">
+              <button class="tab-btn active" data-tab="tab-curl">cURL</button>
+              <button class="tab-btn" data-tab="tab-python">Python</button>
+              <button class="tab-btn" data-tab="tab-node">Node.js</button>
+            </div>
+            
+            <div class="tab-content">
+              <div id="tab-curl" class="tab-pane active">
+<pre><code class="language-bash">curl -X POST <span class="api-url-placeholder"></span> \
 -H "Content-Type: application/json" \
 -d '{
-  "code": "print(\"Hello from the sandbox!\")"
+  "code": "import numpy as np\nprint(\"AI computed:\", np.mean([10, 20, 30]))"
 }'</code></pre>
-          <h3>Using Python <code>requests</code></h3>
-          <pre><code class="language-python">import requests
-import json
+              </div>
+              <div id="tab-python" class="tab-pane">
+<pre><code class="language-python">import requests
 
-api_url = '<span class="api-url-placeholder"></span>'
+url = "<span class="api-url-placeholder"></span>"
 payload = {
-    'code': 'for i in range(5): print(f"Count: {i}")'
+    "code": "import numpy as np\nprint('AI computed:', np.mean([10, 20, 30]))"
 }
 
-response = requests.post(api_url, json=payload)
+response = requests.post(url, json=payload)
+print(response.json())</code></pre>
+              </div>
+              <div id="tab-node" class="tab-pane">
+<pre><code class="language-javascript">const axios = require('axios');
 
-print("Status Code:", response.status_code)
-print("Response JSON:", json.dumps(response.json(), indent=2))
-</code></pre>
+async function runCode() {
+  const response = await axios.post('<span class="api-url-placeholder"></span>', {
+    code: "import numpy as np\nprint('AI computed:', np.mean([10, 20, 30]))"
+  });
+  console.log(response.data);
+}
+runCode();</code></pre>
+              </div>
+            </div>
+          </div>
         </section>
 
-        <section id="endpoint-details">
+        <section id="endpoint-details" class="scroll-section">
           <h2>Endpoint Details: <code>POST /execute</code></h2>
-          <h3>Request Body Schema</h3>
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>Field</th>
-                  <th>Type</th>
-                  <th>Required</th>
-                  <th>Description</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><code>code</code></td>
-                  <td>String</td>
-                  <td><strong>Yes</strong></td>
-                  <td>
-                    The Python code to execute (max
-                    <strong>2000 characters</strong>).
-                  </td>
-                </tr>
-                <tr>
-                  <td><code>stdin_data</code></td>
-                  <td>String</td>
-                  <td>No</td>
-                  <td>Text data passed to the script's standard input.</td>
-                </tr>
-                <tr>
-                  <td><code>attachments</code></td>
-                  <td>Array of Objects</td>
-                  <td>No</td>
-                  <td>
-                    Files to be made available. Max <strong>2 files</strong>,
-                    <strong>8MB</strong> each. Each object needs
-                    <code>filename</code> and <code>content_base_64</code> keys.
-                  </td>
-                </tr>
-                <tr>
-                  <td><code>return_files</code></td>
-                  <td>Array of Strings</td>
-                  <td>No</td>
-                  <td>
-                    A list of filenames generated by the script to be returned
-                    in the response.
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          
+          <details>
+            <summary>View JSON Request Schema</summary>
+<pre><code class="language-json">{
+  "type": "object",
+  "required": ["code"],
+  "properties": {
+    "code": { "type": "string", "maxLength": 2000 },
+    "stdin_data": { "type": "string" },
+    "attachments": {
+      "type": "array",
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "properties": {
+          "filename": { "type": "string" },
+          "content_base_64": { "type": "string" }
+        }
+      }
+    },
+    "return_files": { "type": "array", "items": { "type": "string" } }
+  }
+}</code></pre>
+          </details>
 
-          <h3>Allowed Libraries</h3>
-          <p>
-            Your code can import from a curated list of standard library and
-            third-party modules. Attempts to import any module not on this list
-            will result in a <code>ForbiddenImportError</code>.
-          </p>
+          <h3>Allowed AI Libraries</h3>
+          <p>Agents can import from a curated list of modules. Banned modules trigger a <code>ForbiddenImportError</code>.</p>
           <div class="table-wrapper">
             <table>
               <thead>
@@ -573,308 +825,329 @@ print("Response JSON:", json.dumps(response.json(), indent=2))
               </thead>
               <tbody>
                 <tr>
-                  <td>Key Third-Party Libraries</td>
-                  <td><code>numpy</code></td>
+                  <td>Data Science & Math</td>
+                  <td><code>numpy</code>, <code>math</code>, <code>statistics</code>, <code>random</code></td>
                 </tr>
                 <tr>
-                  <td>Media & Document Generation</td>
-                  <td>
-                    <code>PIL (Pillow)</code>, <code>reportlab</code>,
-                    <code>fpdf</code>
-                  </td>
+                  <td>Media Generation</td>
+                  <td><code>PIL (Pillow)</code>, <code>reportlab</code>, <code>fpdf</code></td>
                 </tr>
                 <tr>
-                  <td>Data & Math</td>
-                  <td>
-                    <code>math</code>, <code>statistics</code>,
-                    <code>decimal</code>, <code>fractions</code>,
-                    <code>numbers</code>, <code>random</code>
-                  </td>
-                </tr>
-                <tr>
-                  <td>Date & Time</td>
-                  <td>
-                    <code>datetime</code>, <code>time</code>,
-                    <code>calendar</code>
-                  </td>
-                </tr>
-                <tr>
-                  <td>Text & Regex</td>
-                  <td>
-                    <code>string</code>, <code>re</code>, <code>textwrap</code>,
-                    <code>unicodedata</code>
-                  </td>
-                </tr>
-                <tr>
-                  <td>Data Structures & Iteration</td>
-                  <td>
-                    <code>collections</code>, <code>itertools</code>,
-                    <code>functools</code>, <code>operator</code>,
-                    <code>bisect</code>, <code>heapq</code>, <code>array</code>
-                  </td>
-                </tr>
-                <tr>
-                  <td>Security & Encoding</td>
-                  <td>
-                    <code>hashlib</code>, <code>base64</code>, <code>uuid</code>,
-                    <code>secrets</code>
-                  </td>
-                </tr>
-                <tr>
-                  <td>Data Serialization</td>
-                  <td><code>json</code>, <code>ast</code></td>
-                </tr>
-                <tr>
-                  <td>General Utilities</td>
-                  <td>
-                    <code>typing</code>, <code>enum</code>,
-                    <code>dataclasses</code>, <code>copy</code>,
-                    <code>pprint</code>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <h3>Error Responses</h3>
-          <p>
-            Errors are returned with a descriptive JSON body and an appropriate
-            HTTP status code.
-          </p>
-          <div class="table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>Status Code</th>
-                  <th>Error Type</th>
-                  <th>Reason</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><code>400 Bad Request</code></td>
-                  <td><code>ValidationError</code></td>
-                  <td>
-                    The request JSON is malformed, a file is too large, etc.
-                  </td>
-                </tr>
-                <tr>
-                  <td><code>400 Bad Request</code></td>
-                  <td><code>ForbiddenImportError</code></td>
-                  <td>The script attempts to import a disallowed module.</td>
-                </tr>
-                <tr>
-                  <td><code>400 Bad Request</code></td>
-                  <td><code>TimeoutError</code></td>
-                  <td>Execution exceeded the 10-second time limit.</td>
-                </tr>
-                <tr>
-                  <td><code>429 Too Many Requests</code></td>
-                  <td><code>RateLimitExceeded</code></td>
-                  <td>
-                    The per-minute or daily request limit has been reached.
-                  </td>
-                </tr>
-                <tr>
-                  <td><code>503 Service Unavailable</code></td>
-                  <td><code>ServerBusy</code></td>
-                  <td>
-                    The server has reached its maximum concurrent execution
-                    limit.
-                  </td>
+                  <td>Data Structures</td>
+                  <td><code>collections</code>, <code>itertools</code>, <code>json</code>, <code>base64</code></td>
                 </tr>
               </tbody>
             </table>
           </div>
         </section>
 
-        <section id="example">
-          <h2>Complete Example: Image Grayscaling</h2>
+        <section id="example" class="scroll-section">
+          <h2>Complete Example: LLM File Processing</h2>
           <p>
-            This example demonstrates a complete workflow: uploading an image,
-            using the <strong>Pillow</strong> library to convert it to
-            grayscale, and receiving the processed image back.
+            This comprehensive workflow demonstrates how an application processes an image file by sending structured execution tasks to the sandbox directory. The examples below convert a local image to base64, transmit it along with processing instructions, save the modified image returned by the sandbox server, and archive the full API response structure into a local JSON file.
           </p>
-          <div class="note">
-            <p>
-              <strong>Note:</strong> To run the client script, you need the
-              <code>requests</code> library (<code>pip install requests</code>)
-              and a local image file named <code>my_photo.jpg</code>.
-            </p>
-          </div>
-          <h3>1. The Sandbox Script</h3>
-          <p>
-            This is the code that will run on the server. It opens the attached
-            file by its given name, processes it, and saves a new file which we
-            will ask the API to return.
-          </p>
-          <pre><code class="language-python"># This script is sent in the 'code' field
-from PIL import Image
 
-try:
-    # 'input_photo.jpg' is the filename we specify in the attachment
-    with Image.open('input_photo.jpg') as img:
-        grayscale_img = img.convert('L')
-        grayscale_img.save('output_grayscale.png')
-        print("Image successfully converted to grayscale.")
-except FileNotFoundError:
-    print("Error: 'input_photo.jpg' not found in attachments.")
-except Exception as e:
-    print(f"An unexpected error occurred: {e}")
-</code></pre>
-          <h3>2. The Client-Side Request</h3>
-          <p>
-            This Python script runs on your local machine. It reads your image,
-            constructs the API payload, sends the request, and saves the result.
-          </p>
-          <pre><code class="language-python"># This script runs on your local machine
-import requests
+          <div class="code-tabs" style="margin-bottom: 25px;">
+            <div class="tab-headers">
+              <button class="tab-btn active" data-tab="workflow-python">Python Implementation</button>
+              <button class="tab-btn" data-tab="workflow-node">Node.js Implementation</button>
+            </div>
+            
+            <div class="tab-content">
+              <div id="workflow-python" class="tab-pane active">
+<pre><code class="language-python">import requests
 import base64
 import json
 
 API_URL = '<span class="api-url-placeholder"></span>'
-LOCAL_IMAGE_PATH = 'my_photo.jpg' # Make sure this file exists
-RESULT_IMAGE_PATH = 'result_grayscale.png'
 
-# The sandbox script from above
-sandbox_code = """
-from PIL import Image
+# 1. Read the local asset file and encode it to Base64
 try:
-    with Image.open('input_photo.jpg') as img:
-        grayscale_img = img.convert('L')
-        grayscale_img.save('output_grayscale.png')
-        print("Image successfully converted to grayscale.")
-except Exception as e:
-    print(f"An unexpected error occurred: {e}")
-"""
-
-# 1. Read local image and Base64 encode it
-try:
-    with open(LOCAL_IMAGE_PATH, "rb") as image_file:
+    with open('my_photo.jpg', "rb") as image_file:
         b64_content = base64.b64encode(image_file.read()).decode('utf-8')
 except FileNotFoundError:
-    print(f"Error: Please create a file named '{LOCAL_IMAGE_PATH}' to run this.")
+    print("Please ensure 'my_photo.jpg' exists in your execution context.")
     exit()
 
-# 2. Construct the API payload
+# 2. Package sandbox script instructions along with data attachments
 payload = {
-    "code": sandbox_code,
-    "attachments": [{
-        "filename": "input_photo.jpg",
-        "content_base_64": b64_content
-    }],
-    "return_files": ["output_grayscale.png"]
+    "code": "from PIL import Image\nwith Image.open('in.jpg') as img:\n  img.convert('L').save('out.png')",
+    "attachments": [{"filename": "in.jpg", "content_base_64": b64_content}],
+    "return_files": ["out.png"]
 }
 
-# 3. Send the request
-print(f"Sending request to {API_URL}...")
+# 3. Transmit request payload synchronously to the remote pipeline
 response = requests.post(API_URL, json=payload)
 
-# 4. Process the response
+# 4. Process pipeline response structural variables
 if response.status_code == 200:
-    data = response.json().get('execution_details', {})
-    print("API Call Successful!")
-    print(f"  > Stdout: {data.get('stdout', '').strip()}")
+    response_data = response.json()
     
-    output_files = data.get('output_files', {})
-    if 'output_grayscale.png' in output_files:
-        grayscale_data = base64.b64decode(output_files['output_grayscale.png']['content_base64'])
-        with open(RESULT_IMAGE_PATH, "wb") as f:
-            f.write(grayscale_data)
-        print(f"> Success! Grayscale image saved to '{RESULT_IMAGE_PATH}'")
-    else:
-        print("> Error: The API did not return the processed image.")
+    # Save the absolute JSON response metadata locally for layout reference
+    with open('response_schema.json', 'w') as json_log:
+        json.dump(response_data, json_log, indent=2)
+    print("Output schema written cleanly to 'response_schema.json'")
+
+    execution_details = response_data.get('execution_details', {})
+    
+    # If the targeted file key is present in output array, decode and archive
+    output_files = execution_details.get('output_files', {})
+    if 'out.png' in output_files:
+        result_data = base64.b64decode(output_files['out.png']['content_base64'])
+        with open('result.png', "wb") as image_output:
+            image_output.write(result_data)
+        print("Success! Processed sandboxed image saved safely to 'result.png'")
 else:
-    print(f"API Error: {response.status_code}")
-    print(json.dumps(response.json(), indent=2))
+    print(f"Server rejected processing pipeline. Error code: {response.status_code}")
 </code></pre>
+              </div>
+
+              <div id="workflow-node" class="tab-pane">
+<pre><code class="language-javascript">const axios = require('axios');
+const fs = require('fs');
+
+const API_URL = '<span class="api-url-placeholder"></span>';
+
+async function processRemoteImage() {
+  try {
+    // 1. Read the local asset file and encode it to Base64
+    if (!fs.existsSync('my_photo.jpg')) {
+      console.error("Please ensure 'my_photo.jpg' exists in your execution context.");
+      return;
+    }
+    const b64Content = fs.readFileSync('my_photo.jpg', { encoding: 'base64' });
+
+    // 2. Package sandbox script instructions along with data attachments
+    const payload = {
+      code: "from PIL import Image\nwith Image.open('in.jpg') as img:\n  img.convert('L').save('out.png')",
+      attachments: [{ filename: "in.jpg", content_base_64: b64Content }],
+      return_files: ["out.png"]
+    };
+
+    // 3. Transmit request payload synchronously to the remote pipeline
+    const response = await axios.post(API_URL, payload);
+    const responseData = response.data;
+
+    // 4. Save the absolute JSON response metadata locally for layout reference
+    fs.writeFileSync('response_schema.json', JSON.stringify(responseData, null, 2));
+    console.log("Output schema written cleanly to 'response_schema.json'");
+
+    const executionDetails = responseData.execution_details || {};
+    const outputFiles = executionDetails.output_files || {};
+
+    // If the targeted file key is present in output array, decode and archive
+    if (outputFiles['out.png']) {
+      const resultBuffer = Buffer.from(outputFiles['out.png'].content_base64, 'base64');
+      fs.writeFileSync('result.png', resultBuffer);
+      console.log("Success! Processed sandboxed image saved safely to 'result.png'");
+    }
+  } catch (error) {
+    console.error("Pipeline failure:", error.response ? error.response.data : error.message);
+  }
+}
+
+processRemoteImage();
+</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <h3>Workflow Summary Metrics</h3>
+          <p>When you run either of the workflows above, the script follows this clear order of operations to maximize visibility into execution results:</p>
+          <ul>
+            <li><strong>Data Transformation:</strong> Converts a local image into an standard string representation for clean REST transmission.</li>
+            <li><strong>Instruction Delivery:</strong> Wraps the sandboxed manipulation commands alongside data matrices in the request payload.</li>
+            <li><strong>Format Inspection logging:</strong> The full payload response array is automatically dumped into a file named <code>response_schema.json</code>, enabling quick investigation into stdout metrics, resource utilization, and parsing variables.</li>
+            <li><strong>Reconstruct Assets:</strong> Extracts targeted generated media parameters from the response mapping array and returns a functional data asset locally.</li>
+          </ul>
         </section>
-      </div>
-    </main>
+
+        <section id="developer-profile" class="scroll-section">
+          <h2>Meet the Developer</h2>
+          <a href="https://github.com/lkkhwhb/Python_exeution" target="_blank" rel="noopener noreferrer" id="dev-card-link" class="dev-card-link">
+            <div class="dev-card">
+              <img src="" alt="Developer Avatar" id="dev-avatar" class="dev-avatar" style="background-color: var(--border-color);" />
+              <div class="dev-info">
+                <h3 id="dev-name">Loading Profile...</h3>
+                <p class="dev-login" id="dev-login"></p>
+                <p class="dev-bio" id="dev-bio">Fetching developer profile from GitHub...</p>
+              </div>
+            </div>
+          </a>
+        </section>
+
+      </main>
+    </div>
 
     <footer class="page-footer">
-      <div class="container">
-        <p>&copy; 2024 Python Sandbox API. All rights reserved.</p>
-        <p>
-          Developed by
-          <a
-            href="https://github.com/lkkhwhb"
-            target="_blank"
-            rel="noopener noreferrer"
-            id="developer-link"
-            >Bhargav</a
-          >.
-        </p>
-      </div>
+      <p>&copy; 2024-2026 Python Sandbox API. All rights reserved.</p>
+      <p>
+        Developed by
+        <a href="https://github.com/lkkhwhb" target="_blank" rel="noopener noreferrer" id="developer-link">Bhargav</a>.
+      </p>
     </footer>
 
+    <button id="back-to-top" aria-label="Back to Top">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <path d="M12 4l-8 8h6v8h4v-8h6z"/>
+      </svg>
+    </button>
+
     <script>
-      document.addEventListener("DOMContentLoaded", (event) => {
+      document.addEventListener("DOMContentLoaded", () => {
+        
+        setTimeout(() => {
+          document.documentElement.classList.add('smooth-scroll');
+        }, 100);
+
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const iconMoon = document.getElementById('theme-icon-moon');
+        const iconSun = document.getElementById('theme-icon-sun');
+        const htmlElement = document.documentElement;
+        
+        const savedTheme = localStorage.getItem('api-docs-theme') || 'light';
+        setTheme(savedTheme);
+
+        themeToggleBtn.addEventListener('click', () => {
+          const currentTheme = htmlElement.getAttribute('data-theme');
+          const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+          setTheme(newTheme);
+        });
+
+        function setTheme(theme) {
+          htmlElement.setAttribute('data-theme', theme);
+          localStorage.setItem('api-docs-theme', theme);
+          
+          if (theme === 'dark') {
+            iconMoon.style.display = 'block';
+            iconSun.style.display = 'none';
+          } else {
+            iconMoon.style.display = 'none';
+            iconSun.style.display = 'block';
+          }
+        }
+
+        const baseUrl = window.location.origin;
+        const baseUrlEl = document.getElementById("baseUrl");
+        if(baseUrlEl) baseUrlEl.textContent = baseUrl;
+        
+        const fullApiUrl = baseUrl + "/execute";
+        document.querySelectorAll(".api-url-placeholder").forEach((el) => {
+          el.textContent = fullApiUrl;
+        });
+
+        hljs.highlightAll();
+        
+        const copyIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>`;
+        const checkIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="fill: var(--status-dot);"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`;
+
+        document.querySelectorAll("pre").forEach((preBlock) => {
+          const codeBlock = preBlock.querySelector("code");
+          if (!codeBlock) return;
+          
+          const copyButton = document.createElement("button");
+          copyButton.className = "copy-btn";
+          copyButton.innerHTML = copyIconSvg;
+          copyButton.setAttribute("aria-label", "Copy code to clipboard");
+          copyButton.setAttribute("title", "Copy to clipboard");
+          
+          preBlock.appendChild(copyButton);
+          
+          copyButton.addEventListener("click", () => {
+            navigator.clipboard.writeText(codeBlock.innerText).then(() => {
+              copyButton.innerHTML = checkIconSvg;
+              setTimeout(() => {
+                copyButton.innerHTML = copyIconSvg;
+              }, 2000);
+            }).catch(err => console.error("Failed to copy: ", err));
+          });
+        });
+
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        tabBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const tabId = btn.getAttribute('data-tab');
+            const tabContainer = btn.closest('.code-tabs');
+            
+            tabContainer.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            tabContainer.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+            
+            btn.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+          });
+        });
+
+        const sections = document.querySelectorAll(".scroll-section");
+        const navLinks = document.querySelectorAll(".toc-link");
+        
+        const observerOptions = {
+          root: null,
+          rootMargin: "-20% 0px -60% 0px",
+          threshold: 0
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              const id = entry.target.getAttribute("id");
+              navLinks.forEach(link => {
+                link.classList.remove("active");
+                if (link.getAttribute("href") === `#${id}`) {
+                  link.classList.add("active");
+                }
+              });
+            }
+          });
+        }, observerOptions);
+
+        sections.forEach(section => observer.observe(section));
+
+        const backToTopBtn = document.getElementById("back-to-top");
+        window.addEventListener("scroll", () => {
+          if (window.scrollY > 300) {
+            backToTopBtn.classList.add("show");
+          } else {
+            backToTopBtn.classList.remove("show");
+          }
+        });
+
+        backToTopBtn.addEventListener("click", () => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+
         async function fetchDeveloperInfo() {
           const developerLink = document.getElementById("developer-link");
-          if (!developerLink || !developerLink.href) {
-            document.getElementById("developer-profile").style.display = "none";
-            return;
-          }
-          const githubUrl = developerLink.href;
-          const username = githubUrl.split("/").pop();
-          if (!username) {
-            document.getElementById("developer-profile").style.display = "none";
-            return;
-          }
+          if (!developerLink || !developerLink.href) return;
+          
+          const username = developerLink.href.split("/").pop();
           const apiUrl = `https://api.github.com/users/${username}`;
+          
           const linkEl = document.getElementById("dev-card-link");
           const avatarEl = document.getElementById("dev-avatar");
           const nameEl = document.getElementById("dev-name");
           const loginEl = document.getElementById("dev-login");
           const bioEl = document.getElementById("dev-bio");
+          
           try {
             const response = await fetch(apiUrl);
             if (!response.ok) throw new Error("Network response was not ok");
             const data = await response.json();
-            linkEl.href = data.html_url;
+            
+            linkEl.href = "https://github.com/lkkhwhb/Python_exeution"; 
             avatarEl.src = data.avatar_url;
             avatarEl.alt = `${data.name || data.login}'s avatar`;
             nameEl.textContent = data.name || data.login;
             loginEl.textContent = `@${data.login}`;
-            bioEl.textContent = data.bio || "Developer of this API.";
+            bioEl.textContent = data.bio || "Building robust tools for AI Agents and Developers.";
           } catch (error) {
             nameEl.textContent = username;
             loginEl.textContent = `@${username}`;
-            bioEl.textContent =
-              "Could not load profile from GitHub. Click to visit profile.";
-            linkEl.href = `https://github.com/${username}`;
+            bioEl.textContent = "Could not load profile. Click to visit GitHub.";
+            linkEl.href = `https://github.com/lkkhwhb/Python_exeution`;
           }
         }
-        const baseUrl = window.location.origin;
-        document.getElementById("baseUrl").textContent = baseUrl;
-        const fullApiUrl = baseUrl + "/execute";
-        document.querySelectorAll(".api-url-placeholder").forEach((el) => {
-          el.textContent = fullApiUrl;
-        });
-        hljs.highlightAll();
-        document.querySelectorAll("pre").forEach((preBlock) => {
-          const codeBlock = preBlock.querySelector("code");
-          if (!codeBlock) return;
-          const copyButton = document.createElement("button");
-          copyButton.className = "copy-btn";
-          copyButton.textContent = "Copy";
-          preBlock.appendChild(copyButton);
-          copyButton.addEventListener("click", () => {
-            navigator.clipboard
-              .writeText(codeBlock.innerText)
-              .then(() => {
-                copyButton.textContent = "Copied!";
-                setTimeout(() => {
-                  copyButton.textContent = "Copy";
-                }, 2000);
-              })
-              .catch((err) => {
-                console.error("Failed to copy text: ", err);
-              });
-          });
-        });
         fetchDeveloperInfo();
+
       });
     </script>
   </body>
