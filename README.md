@@ -21,7 +21,7 @@ You can try out the sandbox instantly on the hosted demo server:
 * A user-friendly web interface and documentation are available at the base URL.
 * This demo is **rate-limited** and provided mainly for **testing and exploration**.
 * For stable usage, we recommend running the server locally or deploying it yourself as an admin.
-
+* For user-friendly GUI demo use: https://lkkhwhb.github.io/Python_exeution/
 > **Note:** The public API is open to everyone but is rate-limited to ensure fair usage and server stability. Please see the [Limits & Restrictions](#-limits--restrictions) section for more details.
 
 ## Features
